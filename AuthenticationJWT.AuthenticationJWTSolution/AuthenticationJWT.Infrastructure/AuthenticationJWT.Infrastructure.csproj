@@ -15,8 +15,4 @@
     <ProjectReference Include="..\AuthenticationJWT.Application\AuthenticationJWT.Application.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Repositories\" />
-  </ItemGroup>
-
 </Project>

@@ -3,4 +3,5 @@
   <Project Path="AuthenticationJWT.Domain/AuthenticationJWT.Domain.csproj" />
   <Project Path="AuthenticationJWT.Infrastructure/AuthenticationJWT.Infrastructure.csproj" />
   <Project Path="AuthenticationJWT.PResentation/AuthenticationJWT.Presentation.csproj" />
+  <Project Path="AuthenticationJWT.SharedLibrary/AuthenticationJWT.SharedLibrary.csproj" Id="8c67f790-2735-4896-b668-b0784a71a831" />
 </Solution>

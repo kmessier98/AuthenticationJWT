@@ -1,5 +1,6 @@
 ﻿using AuthenticationJWT.Application.DTOs;
 using AuthenticationJWT.Application.Extensions;
+using AuthenticationJWT.Application.Interfaces;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,33 +12,62 @@ namespace AuthenticationJWT.Presentation.Controllers
     {
         private readonly IValidator<RegisterDTO> _registerValidator;
         private readonly IValidator<LoginDTO> _loginValidator;
+        private readonly IAuthService _authService;
 
-        public AuthController(IValidator<RegisterDTO> registerValidator, IValidator<LoginDTO> loginValidator)
+        public AuthController(IValidator<RegisterDTO> registerValidator, 
+                              IValidator<LoginDTO> loginValidator, 
+                              IAuthService authService)
         {
             _registerValidator = registerValidator;
             _loginValidator = loginValidator;
+            _authService = authService;
         }
 
         [HttpPost("Register")]
         public async Task<IActionResult> Register([FromBody] RegisterDTO request)
         {
             var validationResult = await _registerValidator.ValidateAsync(request);
-
             if (!validationResult.IsValid)
             {
                 validationResult.AddToModelState(ModelState);
                 return UnprocessableEntity(ModelState);
             }
 
-            return Ok();
+            var response = await _authService.RegisterAsync(request);
+            if (!response.IsSuccess)
+            {
+                return BadRequest(response.Message);
+            }
+
+            return Ok(response.Message);
         }
 
 
         [HttpPost("Login")]
-        public async Task<IActionResult> Login([FromBody] LoginDTO request)
+        public async Task<ActionResult<string>> Login([FromBody] LoginDTO request)
         {
+            var validationResult = await _loginValidator.ValidateAsync(request);
+            if (!validationResult.IsValid)
+            {
+                validationResult.AddToModelState(ModelState);
+                return UnprocessableEntity(ModelState);
+            }
 
-            return Ok();
+            string token = "";
+            try
+            {
+                token = await _authService.LoginAsync(request);
+                if (string.IsNullOrEmpty(token))
+                {
+                    return Unauthorized("Invalid credentials.");
+                }
+            } 
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+            return Ok(token);
         }
     }
 }
