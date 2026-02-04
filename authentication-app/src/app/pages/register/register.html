@@ -1,4 +1,26 @@
-<p>register works!</p>
-todo formulaire de register
+<div class="content">
+    <form>
+        <h2>Créer un compte</h2>
+        <div class="form-element">
+            <label for="username">Nom d'utilisateur :</label>
+            <input type="text" id="username" name="username" required />
+        </div>
+        <div class="form-element">
+            <label for="password">Mot de passe :</label>
+            <input type="password" id="password" name="password" required />
+        </div>
+        <div class="form-element roles">
+            <label class="label-role" for="inputState">Rôle :</label>
+            <select [formControl]="selectedRole" id="inputState" class="form-select">
+                <option value="User">Utilisateur</option>
+                <option value="Admin">Administrateur</option>
+            </select>
+        </div>
 
-Vous avez déjà un compte? <a>Connectez-vous à votre compte</a> TODO mettre le lien de la page login
+        <button class="bg bg-primary" type="submit">S'inscrire</button>
+        <div class="login">
+            <span>Déjà un compte ?</span>
+            <a href="/login">Se connecter</a>
+        </div>
+    </form>
+</div>

@@ -8,6 +8,4 @@ import { Navbar } from './navbar/navbar';
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })
-export class App {
-  protected readonly title = signal('authentication-app');
-}
+export class App {}
