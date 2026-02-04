@@ -1,4 +1,6 @@
 <Solution>
   <Project Path="AuthenticationJWT.Application/AuthenticationJWT.Application.csproj" />
   <Project Path="AuthenticationJWT.Domain/AuthenticationJWT.Domain.csproj" />
+  <Project Path="AuthenticationJWT.Infrastructure/AuthenticationJWT.Infrastructure.csproj" />
+  <Project Path="AuthenticationJWT.PResentation/AuthenticationJWT.Presentation.csproj" />
 </Solution>
