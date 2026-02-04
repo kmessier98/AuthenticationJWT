@@ -1,10 +1,11 @@
 .content {
-  height: 93vh;
+  height: 92vh;
   width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
   background-color: #e0e0e0;
+  overflow: hidden;
 }
 
 form {
