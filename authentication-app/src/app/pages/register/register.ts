@@ -1,9 +1,9 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, FormsModule, Validators } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth-service';
 import { passwordMatchValidator } from '../../utils/functions';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 
 interface Role {
   value: string;
@@ -16,14 +16,15 @@ interface Role {
   templateUrl: './register.html',
   styleUrls: ['./register.scss'],
 })
-export class Register implements OnInit {
+export class Register implements OnInit, OnDestroy {
   profileForm!: FormGroup;
   roles: Role[] = [];
+  subscriptions: Subscription[] = []; 
 
   constructor(private fb: FormBuilder, private authService: AuthService) {}
 
   ngOnInit(): void {
-    this.authService.getUserRoles().subscribe((roles) => {
+    this.subscriptions.push(this.authService.getUserRoles().subscribe((roles) => {
       this.roles = roles;
       this.profileForm = this.fb.group(
         {
@@ -34,7 +35,8 @@ export class Register implements OnInit {
         },
         { validators: passwordMatchValidator }
       );
-    });   
+      })
+    );   
   }
 
   get isFormInvalid(): boolean {
@@ -59,20 +61,31 @@ export class Register implements OnInit {
 
   onSubmit(): void {
     if (!this.isFormInvalid) {
-      // Ne pas utiliser, car je ne veux pas envoyer le confirmPassword au backend
-      // const formData = {
+      // const formData = {   // Ne pas utiliser, car je ne veux pas envoyer le confirmPassword au backend
       //  ...this.profileForm.value
       // AutreValue: this.AutreValue
       // };
       // ou bien
-      // const formData = this.profileForm.value)
+      // const formData = this.profileForm.value); // Ne pas utiliser, car je ne veux pas envoyer le confirmPassword au backend
 
       // formData without confirmPassword
       const { confirmPassword, ...formData } = this.profileForm.value;
 
-      console.log('Form Data Submitted: ', formData);
+      this.subscriptions.push(this.authService.register(formData).subscribe({
+        next: (response) => {
+          //TODO rediriger vers login
+          console.log('Registration successful:', response);
+        },
+        error: (error) => {
+          console.error('Registration failed:', error);
+        }
+      }));
     } else {
       console.log('Form is invalid');
     }
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.forEach(subscription => subscription.unsubscribe()); 
   }
 }

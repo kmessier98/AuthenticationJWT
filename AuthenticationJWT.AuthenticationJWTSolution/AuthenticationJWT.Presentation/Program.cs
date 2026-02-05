@@ -6,6 +6,7 @@ using AuthenticationJWT.Infrastructure.Data;
 using AuthenticationJWT.Infrastructure.Repositories;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -45,6 +46,17 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+//Ajout de cors pour autoriser les requetes depuis le frontend
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AngularPolicy", policy =>
+    {
+        policy.WithOrigins("http://localhost:4200") // Url de mon front end!!
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -55,7 +67,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-//app.UseAuthentication(); // This line enables authentication middleware. Utile pour....
+app.UseCors("AngularPolicy"); // Utilisation de la politique CORS
+//app.UseAuthentication(); // Pas sure de comprendre l utilite, ca marche sans...
 app.UseAuthorization();
 app.MapControllers();
 

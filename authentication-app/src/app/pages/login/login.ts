@@ -33,6 +33,7 @@ export class Login implements OnInit {
 
   onSubmit(): void {
     if (!this.isFormInvalid) {
+      //todo call api. if response (token) is null, then show error message
       const formData = this.loginForm.value;
       console.log('Form Data Submitted:', formData);
     }
