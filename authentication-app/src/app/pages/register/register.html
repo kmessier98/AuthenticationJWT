@@ -57,7 +57,8 @@
         </div>
         }
 
-        <button class="btn btn-primary" type="submit" [disabled]="isFormInvalid">S'inscrire</button>
+        <button class="btn btn-primary" type="submit" [disabled]="isFormInvalid">{{isSubmitting ? "S'incrire..." :
+            "S'inscrire"}}</button>
         <div class="login">
             <span>Déjà un compte ?</span>
             <a href="/login">Se connecter</a>

@@ -47,6 +47,7 @@ export class Login implements OnInit, OnDestroy {
         this.authService.login(formData.user, formData.password).subscribe({
           next: (token) => {
             console.log('Login successful, token:', token);
+            //TODO save token in Local Storage
             this.router.navigate(['/accueil']);
           },
           error: (error) => {

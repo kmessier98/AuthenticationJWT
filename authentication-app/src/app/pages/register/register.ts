@@ -3,7 +3,7 @@ import { FormBuilder, FormControl, FormGroup, FormsModule, Validators } from '@a
 import { ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth-service';
 import { passwordMatchValidator } from '../../utils/functions';
-import { Observable, Subscription } from 'rxjs';
+import { exhaustMap, finalize, Observable, Subject, Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 
 interface Role {
@@ -18,6 +18,9 @@ interface Role {
   styleUrls: ['./register.scss'],
 })
 export class Register implements OnInit, OnDestroy {
+  private submit$ = new Subject<void>();
+  isSubmitting = false;
+
   profileForm!: FormGroup;
   roles: Role[] = [];
   subscriptions: Subscription[] = [];
@@ -29,20 +32,8 @@ export class Register implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.subscriptions.push(
-      this.authService.getUserRoles().subscribe((roles) => {
-        this.roles = roles;
-        this.profileForm = this.fb.group(
-          {
-            userName: ['', [Validators.required, Validators.minLength(3)]],
-            password: ['', [Validators.required, Validators.minLength(6)]],
-            confirmPassword: ['', Validators.required],
-            role: [this.roles[0].value, Validators.required],
-          },
-          { validators: passwordMatchValidator },
-        );
-      }),
-    );
+    this.initializeForm();
+    //this.submitObserve();
   }
 
   get isFormInvalid(): boolean {
@@ -65,6 +56,55 @@ export class Register implements OnInit, OnDestroy {
     return this.profileForm.get('confirmPassword');
   }
 
+  initializeForm(): void {
+    this.subscriptions.push(
+      this.authService.getUserRoles().subscribe((roles) => {
+        this.roles = roles;
+        this.profileForm = this.fb.group(
+          {
+            userName: ['', [Validators.required, Validators.minLength(3)]],
+            password: ['', [Validators.required, Validators.minLength(6)]],
+            confirmPassword: ['', Validators.required],
+            role: [this.roles[0].value, Validators.required],
+          },
+          { validators: passwordMatchValidator },
+        );
+      }),
+    );
+  }
+
+  submitObserve(): void {
+    this.submit$
+      .pipe(
+        exhaustMap(() => {
+          this.isSubmitting = true;
+          // const formData = {   // Ne pas utiliser, car je ne veux pas envoyer le confirmPassword au backend
+          //  ...this.profileForm.value
+          // AutreValue: this.AutreValue
+          // };
+          // ou bien
+          // const formData = this.profileForm.value); // Ne pas utiliser, car je ne veux pas envoyer le confirmPassword au backend
+          const { confirmPassword, ...formData } = this.profileForm.value;
+          return this.authService
+            .register(formData)
+            .pipe(finalize(() => (this.isSubmitting = false)));
+        }),
+      )
+      .subscribe({
+        next: (response) => {
+          console.log('Registration successful:', response);
+          this.router.navigate(['/login']);
+        },
+        error: (error) => {
+          if (error.status === 409) {
+            this.isSubmitting = false;
+            this.profileForm.setErrors({ serverError: 'Nom d’utilisateur déjà pris.' });
+            return;
+          }
+        },
+      });
+  }
+
   onSubmit(): void {
     if (!this.isFormInvalid) {
       // const formData = {   // Ne pas utiliser, car je ne veux pas envoyer le confirmPassword au backend
@@ -79,6 +119,8 @@ export class Register implements OnInit, OnDestroy {
 
       //TODO ne pas permettre de spam cliks sur le bouton submit
       //jai reussi a créer 2 user en spam clikant avec le meme nom
+      //help me use exhaustmap
+
       this.subscriptions.push(
         this.authService.register(formData).subscribe({
           next: (response) => {
@@ -88,7 +130,6 @@ export class Register implements OnInit, OnDestroy {
           error: (error) => {
             if (error.status === 409) {
               this.profileForm.setErrors({ serverError: 'Nom d’utilisateur déjà pris.' });
-
               return;
             }
           },
@@ -101,5 +142,6 @@ export class Register implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscriptions.forEach((subscription) => subscription.unsubscribe());
+    this.submit$.complete();
   }
 }
