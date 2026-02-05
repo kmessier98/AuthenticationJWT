@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth-service';
-import { form } from '@angular/forms/signals';
 import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-login',
@@ -10,8 +10,9 @@ import { Router } from '@angular/router';
   templateUrl: './login.html',
   styleUrl: './login.scss',
 })
-export class Login implements OnInit {
+export class Login implements OnInit, OnDestroy {
   loginForm!: FormGroup;
+  subscriptions: Subscription[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -40,20 +41,28 @@ export class Login implements OnInit {
 
   onSubmit(): void {
     if (!this.isFormInvalid) {
-      //TODO call api. if response (token) is null, then show error message
-
       //TODO ne pas permettre de spam cliks sur le bouton submit
-      //jai reussi a créer 2 user en spam clikant avec le meme nom
       const formData = this.loginForm.value;
-      this.authService.login(formData.user, formData.password).subscribe({
-        next: (token) => {
-          console.log('Login successful, token:', token);
-          this.router.navigate(['/accueil']);
-        },
-        error: (error) => {
-          console.error('Login failed:', error);
-        },
-      });
+      this.subscriptions.push(
+        this.authService.login(formData.user, formData.password).subscribe({
+          next: (token) => {
+            console.log('Login successful, token:', token);
+            this.router.navigate(['/accueil']);
+          },
+          error: (error) => {
+            if (error.status === 401) {
+              this.loginForm.setErrors({
+                serverError: "Nom d'utilisateur ou mot de passe incorrect.",
+              });
+              return;
+            }
+          },
+        }),
+      );
     }
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.forEach((subscription) => subscription.unsubscribe());
   }
 }

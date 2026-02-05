@@ -78,16 +78,19 @@ export class Register implements OnInit, OnDestroy {
       const { confirmPassword, ...formData } = this.profileForm.value;
 
       //TODO ne pas permettre de spam cliks sur le bouton submit
+      //jai reussi a créer 2 user en spam clikant avec le meme nom
       this.subscriptions.push(
         this.authService.register(formData).subscribe({
           next: (response) => {
-            //TODO rediriger vers login
             console.log('Registration successful:', response);
             this.router.navigate(['/login']);
           },
           error: (error) => {
-            //TODO catch le conflict d'utilisateur existant et afficher un message d'erreur approprié
-            console.error('Registration failed:', error);
+            if (error.status === 409) {
+              this.profileForm.setErrors({ serverError: 'Nom d’utilisateur déjà pris.' });
+
+              return;
+            }
           },
         }),
       );
