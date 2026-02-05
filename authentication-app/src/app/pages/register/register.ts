@@ -2,7 +2,8 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, FormsModule, Validators } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth-service';
-import { passwordMatchValidator } from '../../utils/passwordMatchValidator';
+import { passwordMatchValidator } from '../../utils/functions';
+import { Observable } from 'rxjs';
 
 interface Role {
   value: string;
@@ -22,17 +23,18 @@ export class Register implements OnInit {
   constructor(private fb: FormBuilder, private authService: AuthService) {}
 
   ngOnInit(): void {
-    this.roles = this.authService.getUserRoles();
-
-    this.profileForm = this.fb.group(
-      {
-        userName: ['', [Validators.required, Validators.minLength(3)]],
-        password: ['', [Validators.required, Validators.minLength(6)]],
-        confirmPassword: ['', Validators.required],
-        role: [this.roles[0].value, Validators.required]
-      },
-    { validators: passwordMatchValidator }
-  );
+    this.authService.getUserRoles().subscribe((roles) => {
+      this.roles = roles;
+      this.profileForm = this.fb.group(
+        {
+          userName: ['', [Validators.required, Validators.minLength(3)]],
+          password: ['', [Validators.required, Validators.minLength(6)]],
+          confirmPassword: ['', Validators.required],
+          role: [this.roles[0].value, Validators.required]
+        },
+        { validators: passwordMatchValidator }
+      );
+    });   
   }
 
   get isFormInvalid(): boolean {

@@ -2,7 +2,7 @@
     <form autocomplete="off" [formGroup]="profileForm" (ngSubmit)="onSubmit()">
         <h2>Créer un compte</h2>
         <div class="form-element">
-            <label for="username">Nom d'utilisateur :</label>
+            <label for="username">Nom d'utilisateur<span class="required">*</span></label>
             <input type="text" id="username" name="username" formControlName="userName" />
             @if (userName?.invalid && (userName?.touched || userName?.dirty)) {
                 <div class="error-message">
@@ -15,7 +15,7 @@
             }
         </div>
         <div class="form-element">
-            <label for="password">Mot de passe :</label>
+            <label for="password">Mot de passe<span class="required">*</span></label>
             <input type="password" id="password" name="password" formControlName="password" />
              @if (password?.invalid && (password?.touched || password?.dirty)) {
                 <div class="error-message">
@@ -27,11 +27,11 @@
                 </div>
             }
 
-            <label for="confirmPassword">Confirmer le mot de passe :</label>
+            <label for="confirmPassword">Confirmer le mot de passe<span class="required">*</span></label>
             <input type="password" id="confirmPassword" name="confirmPassword" formControlName="confirmPassword" />
         </div>
         <div class="form-element roles">
-            <label class="label-role" for="inputState">Rôle :</label>
+            <label class="label-role" for="inputState">Rôle<span class="required">*</span></label>
             <select formControlName="role" id="inputState" class="form-select">
                 <option [ngValue]="null" disabled>Choisissez un rôle </option>
                 @for (role of roles; track role.value) {
