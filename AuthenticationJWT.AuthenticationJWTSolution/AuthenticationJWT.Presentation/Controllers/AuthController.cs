@@ -42,10 +42,10 @@ namespace AuthenticationJWT.Presentation.Controllers
             var response = await _authService.RegisterAsync(request);
             if (!response.IsSuccess)
             {
-                return BadRequest(response.Message);
+                return Conflict(new { response.Message });
             }
 
-            return Ok(response.Message);
+            return Ok(new { response.Message });
         }
 
 
@@ -65,15 +65,15 @@ namespace AuthenticationJWT.Presentation.Controllers
                 token = await _authService.LoginAsync(request);
                 if (string.IsNullOrEmpty(token))
                 {
-                    return Unauthorized("Invalid credentials.");
+                    return Unauthorized(new { message = "Invalid credentials." });
                 }
             } 
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { ex.Message });
             }
 
-            return Ok(token);
+            return Ok(new { token });
         }
     }
 }

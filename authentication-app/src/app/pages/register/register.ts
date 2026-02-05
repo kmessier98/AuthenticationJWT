@@ -4,6 +4,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth-service';
 import { passwordMatchValidator } from '../../utils/functions';
 import { Observable, Subscription } from 'rxjs';
+import { Router } from '@angular/router';
 
 interface Role {
   value: string;
@@ -19,32 +20,37 @@ interface Role {
 export class Register implements OnInit, OnDestroy {
   profileForm!: FormGroup;
   roles: Role[] = [];
-  subscriptions: Subscription[] = []; 
+  subscriptions: Subscription[] = [];
 
-  constructor(private fb: FormBuilder, private authService: AuthService) {}
+  constructor(
+    private fb: FormBuilder,
+    private authService: AuthService,
+    private router: Router,
+  ) {}
 
   ngOnInit(): void {
-    this.subscriptions.push(this.authService.getUserRoles().subscribe((roles) => {
-      this.roles = roles;
-      this.profileForm = this.fb.group(
-        {
-          userName: ['', [Validators.required, Validators.minLength(3)]],
-          password: ['', [Validators.required, Validators.minLength(6)]],
-          confirmPassword: ['', Validators.required],
-          role: [this.roles[0].value, Validators.required]
-        },
-        { validators: passwordMatchValidator }
-      );
-      })
-    );   
+    this.subscriptions.push(
+      this.authService.getUserRoles().subscribe((roles) => {
+        this.roles = roles;
+        this.profileForm = this.fb.group(
+          {
+            userName: ['', [Validators.required, Validators.minLength(3)]],
+            password: ['', [Validators.required, Validators.minLength(6)]],
+            confirmPassword: ['', Validators.required],
+            role: [this.roles[0].value, Validators.required],
+          },
+          { validators: passwordMatchValidator },
+        );
+      }),
+    );
   }
 
   get isFormInvalid(): boolean {
     return this.profileForm.invalid;
   }
 
-  get userName() {   
-     return this.profileForm.get('userName');
+  get userName() {
+    return this.profileForm.get('userName');
   }
 
   get password() {
@@ -71,21 +77,26 @@ export class Register implements OnInit, OnDestroy {
       // formData without confirmPassword
       const { confirmPassword, ...formData } = this.profileForm.value;
 
-      this.subscriptions.push(this.authService.register(formData).subscribe({
-        next: (response) => {
-          //TODO rediriger vers login
-          console.log('Registration successful:', response);
-        },
-        error: (error) => {
-          console.error('Registration failed:', error);
-        }
-      }));
+      //TODO ne pas permettre de spam cliks sur le bouton submit
+      this.subscriptions.push(
+        this.authService.register(formData).subscribe({
+          next: (response) => {
+            //TODO rediriger vers login
+            console.log('Registration successful:', response);
+            this.router.navigate(['/login']);
+          },
+          error: (error) => {
+            //TODO catch le conflict d'utilisateur existant et afficher un message d'erreur approprié
+            console.error('Registration failed:', error);
+          },
+        }),
+      );
     } else {
       console.log('Form is invalid');
     }
   }
 
   ngOnDestroy(): void {
-    this.subscriptions.forEach(subscription => subscription.unsubscribe()); 
+    this.subscriptions.forEach((subscription) => subscription.unsubscribe());
   }
 }

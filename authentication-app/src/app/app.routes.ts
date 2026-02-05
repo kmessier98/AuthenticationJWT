@@ -17,4 +17,8 @@ export const routes: Routes = [
     path: 'accueil',
     component: Accueil,
   },
+  {
+    path: '**',
+    redirectTo: 'register',
+  },
 ];

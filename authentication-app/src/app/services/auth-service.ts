@@ -11,7 +11,7 @@ export class AuthService {
 
   constructor(private http: HttpClient) {}
 
-  getUserRoles() : Observable<{value: string, viewValue: string}[]> {
+  getUserRoles(): Observable<{ value: string; viewValue: string }[]> {
     return of([
       { value: 'User', viewValue: 'Utilisateur' },
       { value: 'Admin', viewValue: 'Administrateur' },
@@ -20,6 +20,12 @@ export class AuthService {
 
   register(userData: RegisterDTO): Observable<any> {
     return this.http.post(`${this.backendUrl}/register`, userData);
-   // return this.http.get(this.backendUrl + '/test');
+    // return this.http.get(this.backendUrl + '/test');
+  }
+
+  login(userName: string, password: string): Observable<string> {
+    const loginData = { userName, password };
+
+    return this.http.post<string>(`${this.backendUrl}/login`, loginData);
   }
 }
