@@ -4,5 +4,10 @@ import { Injectable } from '@angular/core';
   providedIn: 'root',
 })
 export class AuthService {
-  
+  getUserRoles() {
+    return [
+      { value: 'User', viewValue: 'Utilisateur' },
+      { value: 'Admin', viewValue: 'Administrateur' },
+    ];
+  }
 }

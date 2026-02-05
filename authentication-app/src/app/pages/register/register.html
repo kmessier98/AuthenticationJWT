@@ -1,23 +1,57 @@
 <div class="content">
-    <form>
+    <form autocomplete="off" [formGroup]="profileForm" (ngSubmit)="onSubmit()">
         <h2>Créer un compte</h2>
         <div class="form-element">
             <label for="username">Nom d'utilisateur :</label>
-            <input type="text" id="username" name="username" required />
+            <input type="text" id="username" name="username" formControlName="userName" />
+            @if (userName?.invalid && (userName?.touched || userName?.dirty)) {
+                <div class="error-message">
+                    @if (userName?.errors?.['minlength']) {
+                        Le nom d'utilisateur doit comporter au moins 3 caractères.
+                    } @else {
+                        Le nom d'utilisateur est requis.
+                    }
+                </div>
+            }
         </div>
         <div class="form-element">
             <label for="password">Mot de passe :</label>
-            <input type="password" id="password" name="password" required />
+            <input type="password" id="password" name="password" formControlName="password" />
+             @if (password?.invalid && (password?.touched || password?.dirty)) {
+                <div class="error-message">
+                    @if (password?.errors?.['minlength']) {
+                        Le mot de passe doit comporter au moins 6 caractères.
+                    } @else {
+                        Le mot de passe est requis.
+                    }           
+                </div>
+            }
+
+            <label for="confirmPassword">Confirmer le mot de passe :</label>
+            <input type="password" id="confirmPassword" name="confirmPassword" formControlName="confirmPassword" />
         </div>
         <div class="form-element roles">
             <label class="label-role" for="inputState">Rôle :</label>
-            <select [formControl]="selectedRole" id="inputState" class="form-select">
-                <option value="User">Utilisateur</option>
-                <option value="Admin">Administrateur</option>
+            <select formControlName="role" id="inputState" class="form-select">
+                <option [ngValue]="null" disabled>Choisissez un rôle </option>
+                @for (role of roles; track role.value) {
+                    <option [ngValue]="role.value">{{ role.viewValue }}</option>
+                }
             </select>
+            @if (role?.invalid && (role?.touched || role?.dirty)) {
+                <div class="error-message">
+                    Le rôle est requis.
+                </div>
+            }
         </div>
 
-        <button class="bg bg-primary" type="submit">S'inscrire</button>
+        @if (profileForm.errors?.['mismatch'] && (confirmPassword?.touched || confirmPassword?.dirty)) {
+            <div class="error-message">
+                Les mots de passe ne correspondent pas.
+            </div>
+        }
+
+        <button class="btn btn-primary" type="submit" [disabled]="isFormInvalid">S'inscrire</button>
         <div class="login">
             <span>Déjà un compte ?</span>
             <a href="/login">Se connecter</a>
