@@ -3,7 +3,7 @@ import { FormBuilder, FormControl, FormGroup, FormsModule, Validators } from '@a
 import { ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth-service';
 import { passwordMatchValidator } from '../../utils/functions';
-import { exhaustMap, finalize, Observable, Subject, Subscription } from 'rxjs';
+import { catchError, EMPTY, exhaustMap, finalize, Observable, of, Subject, Subscription, tap } from 'rxjs';
 import { Router } from '@angular/router';
 
 interface Role {
@@ -19,8 +19,8 @@ interface Role {
 })
 export class Register implements OnInit, OnDestroy {
   private submit$ = new Subject<void>();
-  isSubmitting = false;
 
+  isSubmitting = false;
   profileForm!: FormGroup;
   roles: Role[] = [];
   subscriptions: Subscription[] = [];
@@ -33,7 +33,7 @@ export class Register implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.initializeForm();
-    //this.submitObserve();
+    this.listenToSubmit();
   }
 
   get isFormInvalid(): boolean {
@@ -73,68 +73,47 @@ export class Register implements OnInit, OnDestroy {
     );
   }
 
-  submitObserve(): void {
-    this.submit$
-      .pipe(
-        exhaustMap(() => {
-          this.isSubmitting = true;
-          // const formData = {   // Ne pas utiliser, car je ne veux pas envoyer le confirmPassword au backend
-          //  ...this.profileForm.value
-          // AutreValue: this.AutreValue
-          // };
-          // ou bien
-          // const formData = this.profileForm.value); // Ne pas utiliser, car je ne veux pas envoyer le confirmPassword au backend
-          const { confirmPassword, ...formData } = this.profileForm.value;
-          return this.authService
-            .register(formData)
-            .pipe(finalize(() => (this.isSubmitting = false)));
-        }),
-      )
-      .subscribe({
-        next: (response) => {
-          console.log('Registration successful:', response);
-          this.router.navigate(['/login']);
-        },
-        error: (error) => {
-          if (error.status === 409) {
-            this.isSubmitting = false;
-            this.profileForm.setErrors({ serverError: 'Nom d’utilisateur déjà pris.' });
-            return;
-          }
-        },
-      });
+  // Ecoute les soumissions de formulaire pour gérer l'état d'envoi et les appels au service d'authentification
+  // en évitant les soumissions multiples (exhaustMap)
+  listenToSubmit(): void {
+    this.submit$.pipe(
+      exhaustMap(() => {
+        this.isSubmitting = true;
+        // Exclude confirmPassword from the form data
+        const { confirmPassword, ...formData } = this.profileForm.value;
+
+        return this.authService.register(formData).pipe(
+          //Succès uniquement
+          tap(() => {
+            // debugger; // Aide a comprendre le flux d'execution
+            this.router.navigate(['/login']);
+          }),
+
+          //Gestion des erreurs
+          catchError((error) => {
+            // debugger; // Aide a comprendre le flux d'execution
+            if (error.status === 409) {
+              this.profileForm.setErrors({ serverError: 'Nom d\'utilisateur déjà pris.' });
+              return EMPTY; // ne pas propager d"erreur
+            } 
+              
+            console.error('Registration failed:', error);
+            return EMPTY; // ne pas propager d"erreur        
+          }),
+            
+          finalize(() => { 
+            //debugger; // Aide a comprendre le flux d'execution
+            this.isSubmitting = false; 
+          })
+        );
+      }),
+    )
+    .subscribe();
   }
 
   onSubmit(): void {
     if (!this.isFormInvalid) {
-      // const formData = {   // Ne pas utiliser, car je ne veux pas envoyer le confirmPassword au backend
-      //  ...this.profileForm.value
-      // AutreValue: this.AutreValue
-      // };
-      // ou bien
-      // const formData = this.profileForm.value); // Ne pas utiliser, car je ne veux pas envoyer le confirmPassword au backend
-
-      // formData without confirmPassword
-      const { confirmPassword, ...formData } = this.profileForm.value;
-
-      //TODO ne pas permettre de spam cliks sur le bouton submit
-      //jai reussi a créer 2 user en spam clikant avec le meme nom
-      //help me use exhaustmap
-
-      this.subscriptions.push(
-        this.authService.register(formData).subscribe({
-          next: (response) => {
-            console.log('Registration successful:', response);
-            this.router.navigate(['/login']);
-          },
-          error: (error) => {
-            if (error.status === 409) {
-              this.profileForm.setErrors({ serverError: 'Nom d’utilisateur déjà pris.' });
-              return;
-            }
-          },
-        }),
-      );
+      this.submit$.next();
     } else {
       console.log('Form is invalid');
     }
