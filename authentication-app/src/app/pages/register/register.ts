@@ -62,7 +62,10 @@ export class Register implements OnInit {
       // Ne pas utiliser, car je ne veux pas envoyer le confirmPassword au backend
       // const formData = {
       //  ...this.profileForm.value
+      // AutreValue: this.AutreValue
       // };
+      // ou bien
+      // const formData = this.profileForm.value)
 
       // formData without confirmPassword
       const { confirmPassword, ...formData } = this.profileForm.value;

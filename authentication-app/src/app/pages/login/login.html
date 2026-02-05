@@ -1,14 +1,24 @@
 <div class="content">
-    <form>
+    <form autocomplete="off" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
         <h2>Se connecter</h2>
         <div class="form-element">
-            <label for="username">Nom d'utilisateur :</label>
-            <input type="text" id="username" name="username" required />
+            <label for="username">Nom d'utilisateur<span class="required">*</span></label>
+            <input type="text" id="username" formControlName="user" required />
+            @if (user?.invalid && (user?.touched || user?.dirty)) {
+                <div class="error-message">
+                    Le nom d'utilisateur est requis.
+                </div>
+            }
         </div>
         <div class="form-element">
-            <label for="password">Mot de passe :</label>
-            <input type="password" id="password" name="password" required />
+            <label for="password">Mot de passe<span class="required">*</span></label>
+            <input type="password" id="password" formControlName="password" required />
+            @if (password?.invalid && (password?.touched || password?.dirty)) {
+                <div class="error-message">
+                    Le mot de passe est requis.
+                </div>
+            }
         </div>
-        <button class="bg bg-primary" type="submit">Connexion</button>
+        <button class="btn btn-primary" type="submit" [disabled]="isFormInvalid">Connexion</button>
     </form>
 </div>
