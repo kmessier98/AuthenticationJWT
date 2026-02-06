@@ -61,3 +61,18 @@ form {
     }
   }
 }
+
+.login {
+  margin-top: 15px;
+  text-align: center;
+
+  a {
+    color: #007bff;
+    text-decoration: none;
+    margin-left: 5px;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}

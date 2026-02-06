@@ -28,4 +28,13 @@ export class AuthService {
 
     return this.http.post<string>(`${this.backendUrl}/login`, loginData);
   }
+
+  logout(): void {
+    localStorage.removeItem('auth_token');
+  }
+
+  isAuthenticated(): boolean {
+    const token = localStorage.getItem('auth_token');
+    return !!token;
+  }
 }
