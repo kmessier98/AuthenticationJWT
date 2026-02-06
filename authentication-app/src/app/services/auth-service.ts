@@ -23,10 +23,10 @@ export class AuthService {
     // return this.http.get(this.backendUrl + '/test');
   }
 
-  login(userName: string, password: string): Observable<string> {
+  login(userName: string, password: string): Observable<{token: string}> {
     const loginData = { userName, password };
 
-    return this.http.post<string>(`${this.backendUrl}/login`, loginData);
+    return this.http.post<{token: string}>(`${this.backendUrl}/login`, loginData);
   }
 
   logout(): void {
