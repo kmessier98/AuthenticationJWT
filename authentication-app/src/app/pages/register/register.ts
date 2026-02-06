@@ -18,24 +18,34 @@ interface Role {
   styleUrls: ['./register.scss'],
 })
 export class Register implements OnInit, OnDestroy {
-  private submit$ = new Subject<void>();
-
+  // Propriétés publique
   isSubmitting = false;
   profileForm!: FormGroup;
   roles: Role[] = [];
   subscriptions: Subscription[] = [];
 
+  // Propriétés privée
+  private submit$ = new Subject<void>();
+  
+  // Constructeur
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router,
   ) {}
 
+  // Méthodes du cycle de vie
   ngOnInit(): void {
     this.initializeForm();
     this.listenToSubmit();
   }
+  
+  ngOnDestroy(): void {
+    this.subscriptions.forEach((subscription) => subscription.unsubscribe());
+    this.submit$.complete();
+  }
 
+  // Getters
   get isFormInvalid(): boolean {
     return this.profileForm.invalid;
   }
@@ -56,7 +66,17 @@ export class Register implements OnInit, OnDestroy {
     return this.profileForm.get('confirmPassword');
   }
 
-  initializeForm(): void {
+  // Méthodes publiques
+  onSubmit(): void {
+    if (!this.isFormInvalid) {
+      this.submit$.next();
+    } else {
+      console.log('Form is invalid');
+    }
+  }
+
+  // Méthodes privées
+  private initializeForm(): void {
     this.subscriptions.push(
       this.authService.getUserRoles().subscribe((roles) => {
         this.roles = roles;
@@ -75,7 +95,7 @@ export class Register implements OnInit, OnDestroy {
 
   // Ecoute les soumissions de formulaire pour gérer l'état d'envoi et les appels au service d'authentification
   // en évitant les soumissions multiples (exhaustMap)
-  listenToSubmit(): void {
+  private listenToSubmit(): void {
     this.submit$.pipe(
       exhaustMap(() => {
         this.isSubmitting = true;
@@ -109,18 +129,5 @@ export class Register implements OnInit, OnDestroy {
       }),
     )
     .subscribe();
-  }
-
-  onSubmit(): void {
-    if (!this.isFormInvalid) {
-      this.submit$.next();
-    } else {
-      console.log('Form is invalid');
-    }
-  }
-
-  ngOnDestroy(): void {
-    this.subscriptions.forEach((subscription) => subscription.unsubscribe());
-    this.submit$.complete();
   }
 }
