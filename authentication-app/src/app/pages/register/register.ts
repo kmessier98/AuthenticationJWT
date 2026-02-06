@@ -3,8 +3,8 @@ import { FormBuilder, FormControl, FormGroup, FormsModule, Validators } from '@a
 import { ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth-service';
 import { passwordMatchValidator } from '../../utils/functions';
-import { catchError, EMPTY, exhaustMap, finalize, Observable, of, Subject, Subscription, tap } from 'rxjs';
-import { Router } from '@angular/router';
+import { catchError, EMPTY, exhaustMap, finalize, Subject, Subscription, tap } from 'rxjs';
+import { Router, RouterLink } from '@angular/router';
 
 interface Role {
   value: string;
@@ -26,7 +26,7 @@ export class Register implements OnInit, OnDestroy {
 
   // Propriétés privée
   private submit$ = new Subject<void>();
-  
+
   // Constructeur
   constructor(
     private fb: FormBuilder,
@@ -39,7 +39,7 @@ export class Register implements OnInit, OnDestroy {
     this.initializeForm();
     this.listenToSubmit();
   }
-  
+
   ngOnDestroy(): void {
     this.subscriptions.forEach((subscription) => subscription.unsubscribe());
     this.submit$.complete();
@@ -96,38 +96,39 @@ export class Register implements OnInit, OnDestroy {
   // Ecoute les soumissions de formulaire pour gérer l'état d'envoi et les appels au service d'authentification
   // en évitant les soumissions multiples (exhaustMap)
   private listenToSubmit(): void {
-    this.submit$.pipe(
-      exhaustMap(() => {
-        this.isSubmitting = true;
-        // Exclude confirmPassword from the form data
-        const { confirmPassword, ...formData } = this.profileForm.value;
+    this.submit$
+      .pipe(
+        exhaustMap(() => {
+          this.isSubmitting = true;
+          // Exclude confirmPassword from the form data
+          const { confirmPassword, ...formData } = this.profileForm.value;
 
-        return this.authService.register(formData).pipe(
-          //Succès uniquement
-          tap(() => {
-            // debugger; // Aide a comprendre le flux d'execution
-            this.router.navigate(['/login']);
-          }),
+          return this.authService.register(formData).pipe(
+            //Succès uniquement
+            tap(() => {
+              // debugger; // Aide a comprendre le flux d'execution
+              this.router.navigate(['/login']);
+            }),
 
-          //Gestion des erreurs
-          catchError((error) => {
-            // debugger; // Aide a comprendre le flux d'execution
-            if (error.status === 409) {
-              this.profileForm.setErrors({ serverError: 'Nom d\'utilisateur déjà pris.' });
+            //Gestion des erreurs
+            catchError((error) => {
+              // debugger; // Aide a comprendre le flux d'execution
+              if (error.status === 409) {
+                this.profileForm.setErrors({ serverError: "Nom d'utilisateur déjà pris." });
+                return EMPTY; // ne pas propager d"erreur
+              }
+
+              console.error('Registration failed:', error);
               return EMPTY; // ne pas propager d"erreur
-            } 
-              
-            console.error('Registration failed:', error);
-            return EMPTY; // ne pas propager d"erreur        
-          }),
-            
-          finalize(() => { 
-            //debugger; // Aide a comprendre le flux d'execution
-            this.isSubmitting = false; 
-          })
-        );
-      }),
-    )
-    .subscribe();
+            }),
+
+            finalize(() => {
+              //debugger; // Aide a comprendre le flux d'execution
+              this.isSubmitting = false;
+            }),
+          );
+        }),
+      )
+      .subscribe();
   }
 }

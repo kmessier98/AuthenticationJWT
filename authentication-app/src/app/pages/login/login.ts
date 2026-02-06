@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth-service';
 import { Router } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { Subscription, catchError } from 'rxjs';
 
 @Component({
   selector: 'app-login',
@@ -13,7 +13,7 @@ import { Subscription } from 'rxjs';
 export class Login implements OnInit, OnDestroy {
   loginForm!: FormGroup;
   subscriptions: Subscription[] = [];
-  isSubmitting = false; 
+  isSubmitting = false;
 
   constructor(
     private fb: FormBuilder,
@@ -41,14 +41,15 @@ export class Login implements OnInit, OnDestroy {
   }
 
   onSubmit(): void {
-    if (this.isSubmitting) // Prevent multiple submissions. Moins clean que l'utilisation de exhaustMap mais fonctionne correctement
-       return; 
-    
-        
+    if (this.isSubmitting)
+      // Prevent multiple submissions. Moins clean que l'utilisation de exhaustMap mais fonctionne correctement
+      return;
+
     if (!this.isFormInvalid) {
       this.isSubmitting = true;
       const formData = this.loginForm.value;
 
+      // how to intercept ERR_CONNECTION_REFUSED error ?
       this.subscriptions.push(
         this.authService.login(formData.user, formData.password).subscribe({
           next: (reponse) => {
@@ -68,7 +69,7 @@ export class Login implements OnInit, OnDestroy {
           },
           complete: () => {
             this.isSubmitting = false;
-          }
+          },
         }),
       );
     }

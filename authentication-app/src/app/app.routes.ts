@@ -4,6 +4,7 @@ import { Login } from './pages/login/login';
 import { Accueil } from './pages/accueil/accueil';
 import { nonAuthGuard } from './auth/guards/non-auth-guard';
 import { authGuard } from './auth/guards/auth-guard';
+import { NetworkError } from './pages/network-error/network-error';
 
 export const routes: Routes = [
   {
@@ -24,6 +25,10 @@ export const routes: Routes = [
     path: 'accueil',
     component: Accueil,
     canActivate: [authGuard],
+  },
+  {
+    path: 'network-error',
+    component: NetworkError,
   },
   {
     path: '**',
