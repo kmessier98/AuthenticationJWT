@@ -49,30 +49,20 @@ form {
   button {
     margin-top: 20px;
     padding: 10px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    font-size: 16px;
-    cursor: pointer;
-
-    &:hover {
-      background-color: #0056b3 !important;
-    }
   }
-}
 
-.login {
-  margin-top: 15px;
-  text-align: center;
+  .login {
+    margin-top: 15px;
+    text-align: center;
 
-  a {
-    color: #007bff;
-    text-decoration: none;
-    margin-left: 5px;
+    a {
+      color: #007bff;
+      text-decoration: none;
+      margin-left: 5px;
 
-    &:hover {
-      text-decoration: underline;
+      &:hover {
+        text-decoration: underline;
+      }
     }
   }
 }
