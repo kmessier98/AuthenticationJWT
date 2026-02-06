@@ -13,6 +13,7 @@ import { Subscription } from 'rxjs';
 export class Login implements OnInit, OnDestroy {
   loginForm!: FormGroup;
   subscriptions: Subscription[] = [];
+  isSubmitting = false; 
 
   constructor(
     private fb: FormBuilder,
@@ -40,14 +41,18 @@ export class Login implements OnInit, OnDestroy {
   }
 
   onSubmit(): void {
+    if (this.isSubmitting) return; // Prevent multiple submissions
+                                   // Moins clean que l'utilisation de exhaustMap mais fonctionne correctement
+    
     if (!this.isFormInvalid) {
-      //TODO ne pas permettre de spam cliks sur le bouton submit
+      this.isSubmitting = true;
       const formData = this.loginForm.value;
       this.subscriptions.push(
         this.authService.login(formData.user, formData.password).subscribe({
           next: (token) => {
             console.log('Login successful, token:', token);
             //TODO save token in Local Storage
+            this.isSubmitting = false;
             this.router.navigate(['/accueil']);
           },
           error: (error) => {
@@ -55,9 +60,13 @@ export class Login implements OnInit, OnDestroy {
               this.loginForm.setErrors({
                 serverError: "Nom d'utilisateur ou mot de passe incorrect.",
               });
+              this.isSubmitting = false;
               return;
             }
           },
+          complete: () => {
+            this.isSubmitting = false;
+          }
         }),
       );
     }

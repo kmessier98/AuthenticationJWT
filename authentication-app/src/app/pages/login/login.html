@@ -24,6 +24,6 @@
             {{ loginForm.errors?.['serverError'] }}
         </div>
         }
-        <button class="btn btn-primary" type="submit" [disabled]="isFormInvalid">Connexion</button>
+        <button class="btn btn-primary" type="submit" [disabled]="isFormInvalid || isSubmitting">{{this.isSubmitting ? 'Connexion en cours...' : 'Connexion'}}</button>
     </form>
 </div>
