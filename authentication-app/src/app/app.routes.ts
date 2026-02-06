@@ -28,7 +28,6 @@ export const routes: Routes = [
   },
   {
     path: '**',
-    redirectTo: 'accueil',
-    
+    redirectTo: 'accueil',    
   },
 ];

@@ -41,12 +41,14 @@ export class Login implements OnInit, OnDestroy {
   }
 
   onSubmit(): void {
-    if (this.isSubmitting) return; // Prevent multiple submissions
-                                   // Moins clean que l'utilisation de exhaustMap mais fonctionne correctement
+    if (this.isSubmitting) // Prevent multiple submissions. Moins clean que l'utilisation de exhaustMap mais fonctionne correctement
+       return; 
     
+        
     if (!this.isFormInvalid) {
       this.isSubmitting = true;
       const formData = this.loginForm.value;
+
       this.subscriptions.push(
         this.authService.login(formData.user, formData.password).subscribe({
           next: (reponse) => {
