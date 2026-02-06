@@ -6,28 +6,27 @@ import { nonAuthGuard } from './auth/guards/non-auth-guard';
 import { authGuard } from './auth/guards/auth-guard';
 
 export const routes: Routes = [
-  { 
-    path: '', 
+  {
+    path: '',
     redirectTo: 'accueil',
-    pathMatch: 'full'
+    pathMatch: 'full',
   },
   {
-    path: 'register',
-    component: Register,
+    path: 'auth',
     canActivate: [nonAuthGuard],
-  },
-  {
-    path: 'login',
-    component: Login,
-    canActivate: [nonAuthGuard],
+    children: [
+      { path: '', redirectTo: 'login', pathMatch: 'full' },
+      { path: 'login', component: Login },
+      { path: 'register', component: Register },
+    ],
   },
   {
     path: 'accueil',
     component: Accueil,
-    canActivate: [authGuard]
+    canActivate: [authGuard],
   },
   {
     path: '**',
-    redirectTo: 'accueil',    
+    redirectTo: 'accueil',
   },
 ];

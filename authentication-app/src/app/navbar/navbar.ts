@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { RouterLink, RouterLinkActive } from "@angular/router";
+import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../services/auth-service';
 
 @Component({
@@ -9,7 +9,11 @@ import { AuthService } from '../services/auth-service';
   styleUrl: './navbar.scss',
 })
 export class Navbar {
+  currentUrl: string = '';
+
   constructor(private authService: AuthService) {}
+
+  ngonInit(): void {}
 
   get isAuthenticated(): boolean {
     return this.authService.isAuthenticated();

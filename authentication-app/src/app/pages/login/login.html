@@ -24,10 +24,11 @@
             {{ loginForm.errors?.['serverError'] }}
         </div>
         }
-        <button class="btn btn-primary" type="submit" [disabled]="isFormInvalid || isSubmitting">{{this.isSubmitting ? 'Connexion en cours...' : 'Connexion'}}</button>
+        <button class="btn btn-primary" type="submit" [disabled]="isFormInvalid || isSubmitting">{{this.isSubmitting ?
+            'Connexion en cours...' : 'Connexion'}}</button>
         <div class="login">
             <span>Pas encore de compte ?</span>
-            <a href="/register">Créer un compte</a>
+            <a href="/auth/register">Créer un compte</a>
         </div>
     </form>
 </div>
