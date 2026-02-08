@@ -1,4 +1,6 @@
-﻿namespace AuthenticationJWT.Application.DTOs
+﻿using System.Text.Json.Serialization;
+
+namespace AuthenticationJWT.Application.DTOs
 {
     public class UserDTO
     {

@@ -1,5 +1,5 @@
 export interface CurrentUser {
-  Id: string;
-  userName: string;
+  id: string;
+  username: string; 
   role: string;
 }
