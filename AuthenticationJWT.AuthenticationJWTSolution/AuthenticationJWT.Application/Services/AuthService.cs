@@ -36,17 +36,23 @@ namespace AuthenticationJWT.Application.Services
             return await _authRepository.RegisterUser(user);
         }
 
-        public async Task<string> LoginAsync(LoginDTO loginDTO)
+        public async Task<(UserDTO, string)> LoginAsync(LoginDTO loginDTO)
         {
             var user = await _authRepository.ValidateUser(loginDTO.Username, loginDTO.Password);
-            return GenerateToken(user);
+            if (user is null)
+                return (null!, null!);
+
+            var token = GenerateToken(user);
+            return (new UserDTO
+            {
+                Id = user.Id,
+                Username = user.Username,
+                Role = user.Role
+            }, token);
         }
 
         private string GenerateToken(User user)
         {
-            if (user is null)
-                return null!;
-
             var key = Encoding.UTF8.GetBytes(_config.GetSection("JWT:Key").Value!);
             var securityKey = new SymmetricSecurityKey(key);
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);

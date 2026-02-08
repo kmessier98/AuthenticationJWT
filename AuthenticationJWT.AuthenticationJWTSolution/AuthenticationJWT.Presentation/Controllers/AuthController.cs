@@ -59,21 +59,24 @@ namespace AuthenticationJWT.Presentation.Controllers
                 return UnprocessableEntity(ModelState);
             }
 
-            string token = "";
+            string token = string.Empty;
+            UserDTO user = null!;
             try
             {
-                token = await _authService.LoginAsync(request);
-                if (string.IsNullOrEmpty(token))
+                var data = await _authService.LoginAsync(request);
+                if (data.User is null || string.IsNullOrEmpty(data.Token))
                 {
                     return Unauthorized(new { message = "Invalid credentials." });
                 }
+                user = data.Item1;
+                token = data.Item2;
             } 
             catch (Exception ex)
             {
                 return BadRequest(new { ex.Message });
             }
 
-            return Ok(new { token });
+            return Ok(new { user, token });
         }
     }
 }

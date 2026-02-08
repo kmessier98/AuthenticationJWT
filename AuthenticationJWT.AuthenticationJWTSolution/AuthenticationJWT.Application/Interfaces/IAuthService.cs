@@ -6,6 +6,6 @@ namespace AuthenticationJWT.Application.Interfaces
     public interface IAuthService
     {
         Task<Response> RegisterAsync(RegisterDTO registerDTO);
-        Task<string> LoginAsync(LoginDTO loginDTO);
+        Task<(UserDTO User, string Token)> LoginAsync(LoginDTO loginDTO);
     }
 }
