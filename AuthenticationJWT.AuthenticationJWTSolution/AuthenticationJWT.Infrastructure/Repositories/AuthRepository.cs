@@ -29,6 +29,12 @@ namespace AuthenticationJWT.Infrastructure.Repositories
             return user!;
         }
 
+        public async Task<User> GetUserById(Guid id)
+        {
+            var user = await _context.Users.FindAsync(id);
+            return user!;
+        }
+
         public async Task<User> ValidateUser(string username, string password)
         {
             var user = await GetUserByUserName(username);
@@ -40,6 +46,19 @@ namespace AuthenticationJWT.Infrastructure.Repositories
                 return null!;
 
             return user;
+        }
+
+        public async Task<Response> UpdateUser(User user)
+        {
+            var existingUser = await GetUserById(user.Id);
+            if (existingUser is null)
+                return new Response(false, $"User with ID {user.Id} not found.");
+
+            _context.Entry(existingUser).State = EntityState.Detached;
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+
+            return new Response(true, $"User {user.Username} updated successfully.");
         }
     }
 }

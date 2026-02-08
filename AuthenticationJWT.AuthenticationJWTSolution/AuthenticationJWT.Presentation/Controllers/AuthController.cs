@@ -2,6 +2,7 @@
 using AuthenticationJWT.Application.Extensions;
 using AuthenticationJWT.Application.Interfaces;
 using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AuthenticationJWT.Presentation.Controllers
@@ -12,14 +13,17 @@ namespace AuthenticationJWT.Presentation.Controllers
     {
         private readonly IValidator<RegisterDTO> _registerValidator;
         private readonly IValidator<LoginDTO> _loginValidator;
+        private readonly IValidator<UpdateUserDTO> _updateUserValidator;
         private readonly IAuthService _authService;
 
         public AuthController(IValidator<RegisterDTO> registerValidator, 
-                              IValidator<LoginDTO> loginValidator, 
+                              IValidator<LoginDTO> loginValidator,
+                              IValidator<UpdateUserDTO> updateUserValidator,
                               IAuthService authService)
         {
             _registerValidator = registerValidator;
             _loginValidator = loginValidator;
+            _updateUserValidator = updateUserValidator;
             _authService = authService;
         }
 
@@ -71,6 +75,22 @@ namespace AuthenticationJWT.Presentation.Controllers
             }
 
             return Ok(new { user, token });
+        }
+
+        [Authorize]
+        [HttpPost("UpdateUser")]
+        public async Task<IActionResult> UpdateUser([FromBody] UpdateUserDTO request)
+        {
+            var validationResult = await _updateUserValidator.ValidateAsync(request);
+            if (!validationResult.IsValid)
+            {
+                validationResult.AddToModelState(ModelState);
+                return UnprocessableEntity(ModelState);
+            }
+
+            var response = await _authService.UpdateUserAsync(request);
+
+            return response.IsSuccess ? Ok(new { response.Message }) : BadRequest(new { response.Message });
         }
     }
 }

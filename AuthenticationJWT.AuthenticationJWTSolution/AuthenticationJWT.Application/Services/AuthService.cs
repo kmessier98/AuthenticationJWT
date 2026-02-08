@@ -51,6 +51,30 @@ namespace AuthenticationJWT.Application.Services
             }, token);
         }
 
+        public async Task<Response> UpdateUserAsync(UpdateUserDTO updateUserDTO)
+        {
+            var user = await _authRepository.GetUserById(updateUserDTO.Id);
+            if (user is null)
+                return new Response(false, $"User with id {updateUserDTO.Id} not found");
+
+            if (updateUserDTO.Username != user.Username)
+            {
+                var userExists = await _authRepository.GetUserByUserName(updateUserDTO.Username);
+                if (userExists != null)
+                    return new Response(false, $"Username {updateUserDTO.Username} is already taken");
+            }
+
+            var updateUser = new User
+            {
+                Id = user.Id,
+                Username = updateUserDTO.Username,
+                PasswordHash = user.PasswordHash,
+                Role = updateUserDTO.Role
+            };
+
+            return await _authRepository.UpdateUser(updateUser);
+        }
+
         private string GenerateToken(User user)
         {
             var key = Encoding.UTF8.GetBytes(_config.GetSection("JWT:Key").Value!);
