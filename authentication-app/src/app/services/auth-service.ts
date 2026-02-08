@@ -1,15 +1,24 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { RegisterDTO } from '../Models/register.dto';
+import { BehaviorSubject, map, Observable, of } from 'rxjs';
+import { RegisterDTO } from '../Models/auth/register.dto';
+import { CurrentUser } from '../Models/auth/current-user';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
   backendUrl = 'https://localhost:7125/api/auth';
+  private currentUserSubject: BehaviorSubject<CurrentUser | null>;
+  public currentUser$: Observable<CurrentUser | null>;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+    this.currentUserSubject = new BehaviorSubject<CurrentUser | null>(
+      JSON.parse(localStorage.getItem('currentUser') || 'null')
+    );
+    this.currentUser$ = this.currentUserSubject.asObservable();
+  }
+
 
   getUserRoles(): Observable<{ value: string; viewValue: string }[]> {
     return of([
@@ -20,17 +29,25 @@ export class AuthService {
 
   register(userData: RegisterDTO): Observable<any> {
     return this.http.post(`${this.backendUrl}/register`, userData);
-    // return this.http.get(this.backendUrl + '/test');
   }
 
-  login(userName: string, password: string): Observable<{token: string}> {
+  login(userName: string, password: string): Observable<any> {
     const loginData = { userName, password };
 
-    return this.http.post<{token: string}>(`${this.backendUrl}/login`, loginData);
+    return this.http.post<{token: string, user: CurrentUser}>(`${this.backendUrl}/login`, loginData)
+      .pipe(map(response => {
+        const token = response.token;
+        const currentUser = response.user; 
+        localStorage.setItem('auth_token', token);  
+        localStorage.setItem('currentUser', JSON.stringify(response.user)); 
+        this.currentUserSubject.next(currentUser);
+      }));
   }
 
   logout(): void {
     localStorage.removeItem('auth_token');
+    localStorage.removeItem('currentUser');
+    this.currentUserSubject.next(null);
   }
 
   isAuthenticated(): boolean {

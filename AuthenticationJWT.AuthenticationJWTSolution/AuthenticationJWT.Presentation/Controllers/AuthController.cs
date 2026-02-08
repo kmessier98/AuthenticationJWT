@@ -23,12 +23,6 @@ namespace AuthenticationJWT.Presentation.Controllers
             _authService = authService;
         }
 
-        [HttpGet("Test")]
-        public async Task<IActionResult> Test()
-        {
-            return Ok(new { message = "Bravo, vous avez reussis!"});
-        }
-
         [HttpPost("Register")]
         public async Task<IActionResult> Register([FromBody] RegisterDTO request)
         {
