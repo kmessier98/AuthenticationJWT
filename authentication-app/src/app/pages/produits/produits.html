@@ -2,7 +2,9 @@
     <h1>Catalogue de produits</h1>
 
     <div class="actions">
-        <button class="btn btn-primary">Ajouter un produit</button>
+        @if (currentUser?.role === 'Admin') {
+        <button class="btn btn-primary" [routerLink]="['/creer-produit']">Ajouter un produit</button>
+        }
         <input type="search" id="site-search" name="q" placeholder="Rechercher un produit..." autocomplete="off" />
     </div>
     <div class="products-liste">

@@ -7,6 +7,8 @@ import { nonAuthGuard } from './auth/guards/non-auth-guard';
 import { authGuard } from './auth/guards/auth-guard';
 import { NetworkError } from './pages/network-error/network-error';
 import { Profil } from './pages/profil/profil';
+import { CreateProduct } from './pages/produits/create-product/create-product';
+import { adminGuard } from './auth/guards/admin-guard';
 
 export const routes: Routes = [
   {
@@ -32,6 +34,12 @@ export const routes: Routes = [
     path: 'produits',
     component: Produits,
     canActivate: [authGuard],
+  },
+  {
+    path: 'creer-produit',
+    component: CreateProduct,
+    canActivate: [adminGuard],
+    data: { role: 'Admin' },
   },
   {
     path: 'mon-profil',
