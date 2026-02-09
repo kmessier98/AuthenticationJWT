@@ -15,10 +15,19 @@ export class ProductService {
     this.getProducts();
   }
 
-  getProducts(): void {
+  private getProducts(): void {
     this.http
       .get<ProductDTO[]>(this.backendUrl + '/GetProducts')
       .pipe(tap((products) => this.productsSubject.next(products)))
       .subscribe();
+  }
+
+  deleteProduct(productId: string): Observable<void> {
+    return this.http.delete<void>(`${this.backendUrl}/DeleteProduct/${productId}`).pipe(
+      tap(() => {
+        const updatedProducts = this.productsSubject.value.filter((p) => p.id !== productId);
+        this.productsSubject.next(updatedProducts);
+      }),
+    );
   }
 }

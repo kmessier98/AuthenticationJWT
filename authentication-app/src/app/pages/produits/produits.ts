@@ -39,6 +39,16 @@ export class Produits implements OnInit, OnDestroy {
     this.products$ = this.productService.products$;
   }
 
+  deleteProduct(productId: string): void {
+    this.subscriptions.push(
+      this.productService.deleteProduct(productId).subscribe({
+        next: () => {
+          console.log('Produit supprimé avec succès');
+        },
+      }),
+    );
+  }
+
   ngOnDestroy(): void {
     this.subscriptions.forEach((sub) => sub.unsubscribe());
   }
