@@ -5,6 +5,7 @@ import { Accueil } from './pages/accueil/accueil';
 import { nonAuthGuard } from './auth/guards/non-auth-guard';
 import { authGuard } from './auth/guards/auth-guard';
 import { NetworkError } from './pages/network-error/network-error';
+import { Profil } from './pages/profil/profil';
 
 export const routes: Routes = [
   {
@@ -24,6 +25,11 @@ export const routes: Routes = [
   {
     path: 'accueil',
     component: Accueil,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'mon-profil',
+    component: Profil,
     canActivate: [authGuard],
   },
   {

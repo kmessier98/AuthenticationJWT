@@ -68,7 +68,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseCors("AngularPolicy"); // Utilisation de la politique CORS
-//app.UseAuthentication(); // Pas sure de comprendre l utilite, ca marche sans...
+app.UseAuthentication(); // Important de mettre avant Authorization
 app.UseAuthorization();
 app.MapControllers();
 

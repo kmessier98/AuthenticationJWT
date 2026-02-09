@@ -54,4 +54,14 @@ export class AuthService {
     const token = localStorage.getItem('auth_token');
     return !!token;
   }
+
+  updateUserProfile(updatedProfile: CurrentUser): Observable<any> {
+    return this.http.put(`${this.backendUrl}/UpdateUser`, updatedProfile)
+      .pipe(
+        map((response: any) => {
+          localStorage.setItem('currentUser', JSON.stringify(updatedProfile)); 
+          this.currentUserSubject.next(updatedProfile);
+        }),
+      );
+  }
 }

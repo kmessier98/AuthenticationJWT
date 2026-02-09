@@ -90,7 +90,7 @@ namespace AuthenticationJWT.Application.Services
                 issuer: _config.GetSection("JWT:Issuer").Value,
                 audience: _config.GetSection("JWT:Audience").Value,
                 claims: claims,
-                expires: DateTime.Now.AddMinutes(15), //TODOO
+                expires: DateTime.Now.AddMinutes(int.Parse(_config["JWT:TokenLifetimeMinutes"]!)), // TODO integrer refresh token
                 signingCredentials: credentials);
 
             return new JwtSecurityTokenHandler().WriteToken(token);

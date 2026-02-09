@@ -78,7 +78,7 @@ namespace AuthenticationJWT.Presentation.Controllers
         }
 
         [Authorize]
-        [HttpPost("UpdateUser")]
+        [HttpPut("UpdateUser")]
         public async Task<IActionResult> UpdateUser([FromBody] UpdateUserDTO request)
         {
             var validationResult = await _updateUserValidator.ValidateAsync(request);
@@ -86,11 +86,26 @@ namespace AuthenticationJWT.Presentation.Controllers
             {
                 validationResult.AddToModelState(ModelState);
                 return UnprocessableEntity(ModelState);
+
             }
 
             var response = await _authService.UpdateUserAsync(request);
 
-            return response.IsSuccess ? Ok(new { response.Message }) : BadRequest(new { response.Message });
+            if (!response.IsSuccess)
+            {
+                if (response.Message.Contains("not found"))
+                {
+                    return NotFound(new { response.Message });
+                }
+                else if (response.Message.Contains("already taken"))
+                {
+                    return Conflict(new { response.Message });
+                }
+
+                return BadRequest(new { response.Message });
+            }
+
+            return Ok(new { response.Message });
         }
     }
 }

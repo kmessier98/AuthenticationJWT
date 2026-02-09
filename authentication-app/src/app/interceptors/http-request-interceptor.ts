@@ -3,8 +3,17 @@ import { inject } from '@angular/core';
 import { catchError, throwError } from 'rxjs';
 import { Router } from '@angular/router';
 
-export const networkErrorInterceptor: HttpInterceptorFn = (req, next) => {
+export const httpRequestInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
+  const token = localStorage.getItem('auth_token');
+
+  if (token) {
+    req = req.clone({
+      setHeaders: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  }
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {

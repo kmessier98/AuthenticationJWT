@@ -1,0 +1,48 @@
+<div class="content">
+    <form autocomplete="off" [formGroup]="profileForm" (ngSubmit)="onSubmit()">
+        <h2>Mon profil</h2>
+        <div class="form-element">
+            <label for="username">Nom d'utilisateur</label>
+            <input type="text" id="username" name="username" formControlName="username" />
+            @if (username?.invalid && (username?.touched || username?.dirty)) {
+                <div class="error-message">
+                    @if (username?.errors?.['minlength']) {
+                        Le nom d'utilisateur doit comporter au moins 3 caractères.
+                    } @else {
+                        Le nom d'utilisateur est requis.
+                    }
+                </div>
+            }
+        </div>
+        <div class="form-element roles">
+            <label class="label-role" for="inputState">Rôle<span class="required">*</span></label>
+            <select formControlName="role" id="inputState" class="form-select">
+                <option [ngValue]="null" disabled>Choisissez un rôle </option>
+                @for (role of roles; track role.value) {
+                    <option [ngValue]="role.value">{{ role.viewValue }}</option>
+                }
+            </select>
+            @if (role?.invalid && (role?.touched || role?.dirty)) {
+                <div class="error-message">
+                    Le rôle est requis.
+                </div>
+            }
+        </div>
+
+        @if (profileForm.errors?.['serverError']) {
+            <div class="error-message">
+                {{ profileForm.errors?.['serverError'] }}
+            </div>
+        }
+
+        @if (showSuccessMessage) {
+            <div class="mt-3 alert alert-success">
+                Profil mis à jour avec succès !
+            </div>
+        }
+
+        <button class="btn btn-primary" type="submit" [disabled]="isFormInvalid || isSubmitting">{{isSubmitting ?
+            "Modification en cours..." :
+            "Modifier le profil"}}</button>
+    </form>
+</div>
