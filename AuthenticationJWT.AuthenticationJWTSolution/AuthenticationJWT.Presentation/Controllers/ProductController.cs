@@ -22,6 +22,7 @@ namespace AuthenticationJWT.Presentation.Controllers
         [Authorize] //Doit etre connecté pour pouvoir accéder 
         [HttpGet("GetProducts")]
         public async Task<ActionResult<IEnumerable<ProductDTO>>> GetProducts()
+        
         {
             var products = await _productRepository.GetProducts();
 

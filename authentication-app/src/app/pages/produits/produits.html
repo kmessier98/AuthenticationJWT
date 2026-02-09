@@ -1,0 +1,22 @@
+<div class="products-container">
+    <h1>Catalogue de produits</h1>
+
+    <div class="actions">
+        <button class="btn btn-primary">Ajouter un produit</button>
+        <input type="search" id="site-search" name="q" placeholder="Rechercher un produit..." autocomplete="off" />
+    </div>
+    <div class="products-liste">
+        @for (product of products$ | async ; track product.id) {
+        <div class="product-card">
+            <h2>{{ product.name }}</h2>
+            <div class="product-actions">
+                <button class="btn btn-secondary">Modifier</button>
+                @if (currentUser?.role === 'Admin') {
+                <button class="btn btn-danger">Supprimer</button>
+                }
+            </div>
+        </div>
+        }
+    </div>
+
+</div>
