@@ -13,16 +13,16 @@ namespace AuthenticationJWT.Presentation.Controllers
     {
         private readonly IProductRepository _productRepository;
         private readonly IMapper _mapper;
-        public ProductController(IMapper mapper, IProductRepository productRepository) 
+        public ProductController(IMapper mapper, IProductRepository productRepository)
         {
             _mapper = mapper;
-            _productRepository = productRepository;        
+            _productRepository = productRepository;
         }
 
         [Authorize] //Doit etre connecté pour pouvoir accéder 
         [HttpGet("GetProducts")]
         public async Task<ActionResult<IEnumerable<ProductDTO>>> GetProducts()
-        
+
         {
             var products = await _productRepository.GetProducts();
 
@@ -42,5 +42,14 @@ namespace AuthenticationJWT.Presentation.Controllers
             return Ok(response.Message);
         }
 
+        [Authorize(Roles = "Admin")]
+        [HttpDelete("DeleteProduct/{id}")]
+        public async Task<ActionResult> DeleteProduct(Guid id)
+        {
+            var response = await _productRepository.DeleteProduct(id);
+            if (!response.IsSuccess)
+                return NotFound(response.Message);
+            return Ok(new { response.Message});
+        }
     }
 }

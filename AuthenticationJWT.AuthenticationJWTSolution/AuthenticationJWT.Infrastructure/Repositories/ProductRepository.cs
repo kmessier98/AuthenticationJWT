@@ -35,5 +35,15 @@ namespace AuthenticationJWT.Infrastructure.Repositories
         {
             return await _context.Products.AsNoTracking().ToListAsync();
         }
+
+        public async Task<Response> DeleteProduct(Guid id)
+        {
+            var product = await _context.Products.FindAsync(id);
+            if (product is null)
+                return new Response(false, "Product not found.");
+            _context.Products.Remove(product);
+            await _context.SaveChangesAsync();
+            return new Response(true, "Product deleted successfully.");
+        }
     }
 }

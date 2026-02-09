@@ -37,6 +37,7 @@ export class Produits implements OnInit, OnDestroy {
 
   loadProducts(): void {
     this.products$ = this.productService.products$;
+    console.log('Produits chargés :', this.products$);
   }
 
   deleteProduct(productId: string): void {

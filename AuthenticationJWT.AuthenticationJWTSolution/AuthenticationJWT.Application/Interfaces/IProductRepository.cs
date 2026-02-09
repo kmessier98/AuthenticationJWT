@@ -8,5 +8,6 @@ namespace AuthenticationJWT.Application.Interfaces
     {
         Task<Response> AddProduct(Product product);
         Task<IEnumerable<Product>> GetProducts();
+        Task<Response> DeleteProduct(Guid id);
     }
 }
