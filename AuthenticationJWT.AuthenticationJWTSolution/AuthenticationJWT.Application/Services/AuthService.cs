@@ -64,6 +64,8 @@ namespace AuthenticationJWT.Application.Services
                     return new Response(false, $"Username {updateUserDTO.Username} is already taken");
             }
 
+            //todo verrifier si le role a changer!! si c le cas, appeler generatetoken !!
+
             var updateUser = new User
             {
                 Id = user.Id,
