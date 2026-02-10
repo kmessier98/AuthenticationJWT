@@ -3,13 +3,22 @@ import { ProductDTO } from '../../Models/Product/product.dto';
 import { ProductService } from '../../services/product-service';
 import { AuthService } from '../../services/auth-service';
 import { CurrentUser } from '../../Models/auth/current-user';
-import { Subscription, Observable } from 'rxjs';
+import {
+  Subscription,
+  Observable,
+  debounce,
+  debounceTime,
+  distinctUntilChanged,
+  switchMap,
+} from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { FormControl } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-produits',
-  imports: [AsyncPipe, RouterLink],
+  imports: [AsyncPipe, RouterLink, ReactiveFormsModule],
   templateUrl: './produits.html',
   styleUrl: './produits.scss',
 })
@@ -17,6 +26,7 @@ export class Produits implements OnInit, OnDestroy {
   products$: Observable<ProductDTO[]> | null = null;
   currentUser: CurrentUser | null = null;
   subscriptions: Subscription[] = [];
+  searchControl = new FormControl('');
 
   constructor(
     private productService: ProductService,
@@ -26,6 +36,9 @@ export class Produits implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.loadCurrentUser();
     this.loadProducts();
+    this.setupSearchListener();
+    console.log('Current User:', this.currentUser);
+    console.log('Products', this.products$);
   }
 
   loadCurrentUser(): void {
@@ -37,9 +50,20 @@ export class Produits implements OnInit, OnDestroy {
   }
 
   loadProducts(): void {
-    //TODO gerer les errerus (ex si token expire)
-    this.products$ = this.productService.products$;
-    console.log('Produits chargés :', this.products$);
+    this.productService.loadProducts(); //Important de comprendre que ce call se fait une fois dans le OnInit
+    this.products$ = this.productService.products$; // Ici ca ne repasse pas dans le ngOnInit, c'est un observable qui est mis à jour par le service, et le composant se met à jour automatiquement grâce à l'AsyncPipe
+  }
+
+  setupSearchListener(): void {
+    this.subscriptions.push(
+      this.searchControl.valueChanges
+        .pipe(
+          debounceTime(300),
+          distinctUntilChanged(),
+          switchMap((searchTerm) => this.productService.searchProducts(searchTerm || '')),
+        )
+        .subscribe(),
+    );
   }
 
   deleteProduct(productId: string): void {

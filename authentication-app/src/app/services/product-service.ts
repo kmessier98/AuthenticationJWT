@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ProductDTO } from '../Models/Product/product.dto';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { BehaviorSubject, Observable, tap, Subscription } from 'rxjs';
 import { CreateProduct } from '../pages/produits/create-product/create-product';
 import { CreateProductDTO } from '../Models/Product/create-product-dto';
 
@@ -13,15 +13,16 @@ export class ProductService {
   private productsSubject = new BehaviorSubject<ProductDTO[]>([]);
   readonly products$ = this.productsSubject.asObservable();
 
-  constructor(private http: HttpClient) {
-    this.getProducts('');
+  constructor(private http: HttpClient) {}
+
+  public searchProducts(filter: string): Observable<ProductDTO[]> {
+    return this.http
+      .get<ProductDTO[]>(`${this.backendUrl}/GetProducts?name=${filter}`)
+      .pipe(tap((products) => this.productsSubject.next(products)));
   }
 
-  private getProducts(filter: string): void {
-    this.http
-      .get<ProductDTO[]>(`${this.backendUrl}/GetProducts?SearchByName=${filter}`)
-      .pipe(tap((products) => this.productsSubject.next(products)))
-      .subscribe();
+  loadProducts(): void {
+    this.searchProducts('').subscribe();
   }
 
   deleteProduct(productId: string): Observable<void> {
