@@ -89,10 +89,11 @@ namespace AuthenticationJWT.Presentation.Controllers
 
             }
 
-            var response = await _authService.UpdateUserAsync(request);
+            var data = await _authService.UpdateUserAsync(request);
 
-            if (!response.IsSuccess)
+            if (!data.Response.IsSuccess)
             {
+                var response = data.Response;
                 if (response.Message.Contains("not found"))
                 {
                     return NotFound(new { response.Message });
@@ -105,7 +106,7 @@ namespace AuthenticationJWT.Presentation.Controllers
                 return BadRequest(new { response.Message });
             }
 
-            return Ok(new { response.Message });
+            return Ok(new { data.Token });
         }
     }
 }

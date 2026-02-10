@@ -51,20 +51,18 @@ namespace AuthenticationJWT.Application.Services
             }, token);
         }
 
-        public async Task<Response> UpdateUserAsync(UpdateUserDTO updateUserDTO)
+        public async Task<(Response, string)> UpdateUserAsync(UpdateUserDTO updateUserDTO)
         {
             var user = await _authRepository.GetUserById(updateUserDTO.Id);
             if (user is null)
-                return new Response(false, $"User with id {updateUserDTO.Id} not found");
+                return (new Response(false, $"User with id {updateUserDTO.Id} not found"), null!);
 
             if (updateUserDTO.Username != user.Username)
             {
                 var userExists = await _authRepository.GetUserByUserName(updateUserDTO.Username);
                 if (userExists != null)
-                    return new Response(false, $"Username {updateUserDTO.Username} is already taken");
+                    return (new Response(false, $"Username {updateUserDTO.Username} is already taken"), null!);
             }
-
-            //todo verrifier si le role a changer!! si c le cas, appeler generatetoken !!
 
             var updateUser = new User
             {
@@ -74,7 +72,10 @@ namespace AuthenticationJWT.Application.Services
                 Role = updateUserDTO.Role
             };
 
-            return await _authRepository.UpdateUser(updateUser);
+            var token = GenerateToken(updateUser);
+            var response = await _authRepository.UpdateUser(updateUser);
+
+            return (response, token);
         }
 
         private string GenerateToken(User user)

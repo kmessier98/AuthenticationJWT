@@ -7,6 +7,6 @@ namespace AuthenticationJWT.Application.Interfaces
     {
         Task<Response> RegisterAsync(RegisterDTO registerDTO);
         Task<(UserDTO User, string Token)> LoginAsync(LoginDTO loginDTO);
-        Task<Response> UpdateUserAsync(UpdateUserDTO updateUserDTO);
+        Task<(Response Response, string Token)> UpdateUserAsync(UpdateUserDTO updateUserDTO);
     }
 }
