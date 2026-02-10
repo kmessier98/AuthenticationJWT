@@ -14,12 +14,12 @@ export class ProductService {
   readonly products$ = this.productsSubject.asObservable();
 
   constructor(private http: HttpClient) {
-    this.getProducts();
+    this.getProducts('');
   }
 
-  private getProducts(): void {
+  private getProducts(filter: string): void {
     this.http
-      .get<ProductDTO[]>(this.backendUrl + '/GetProducts')
+      .get<ProductDTO[]>(`${this.backendUrl}/GetProducts?SearchByName=${filter}`)
       .pipe(tap((products) => this.productsSubject.next(products)))
       .subscribe();
   }
