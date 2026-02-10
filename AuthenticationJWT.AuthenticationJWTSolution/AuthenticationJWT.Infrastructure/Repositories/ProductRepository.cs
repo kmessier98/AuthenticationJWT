@@ -32,9 +32,17 @@ namespace AuthenticationJWT.Infrastructure.Repositories
 
         }
 
-        public async Task<IEnumerable<Product>> GetProducts()
+        public async Task<IEnumerable<Product>> GetProducts(string name = "")
         {
-            return await _context.Products.AsNoTracking().ToListAsync();
+            if (string.IsNullOrEmpty(name))
+            {
+                return await _context.Products.AsNoTracking().ToListAsync();
+            }
+
+            return await _context.Products
+                .Where(p => p.Name.Contains(name))
+                .AsNoTracking()
+                .ToListAsync();
         }
 
         public async Task<Response> DeleteProduct(Guid id)

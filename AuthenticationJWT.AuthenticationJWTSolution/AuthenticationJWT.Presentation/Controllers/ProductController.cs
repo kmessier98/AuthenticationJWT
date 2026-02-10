@@ -21,10 +21,9 @@ namespace AuthenticationJWT.Presentation.Controllers
 
         [Authorize] //Doit etre connecté pour pouvoir accéder 
         [HttpGet("GetProducts")]
-        public async Task<ActionResult<IEnumerable<ProductDTO>>> GetProducts([FromQuery] string SearchByName = "")
-
+        public async Task<ActionResult<IEnumerable<ProductDTO>>> GetProducts([FromQuery] string name = "")
         {
-            var products = await _productRepository.GetProducts();
+            var products = await _productRepository.GetProducts(name);
 
             var productsDTO = _mapper.Map<IEnumerable<ProductDTO>>(products);
             return productsDTO.Any() ? Ok(productsDTO) : NoContent();
