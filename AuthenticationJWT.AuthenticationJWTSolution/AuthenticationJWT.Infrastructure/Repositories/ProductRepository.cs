@@ -1,4 +1,5 @@
-﻿using AuthenticationJWT.Application.Interfaces;
+﻿using AuthenticationJWT.Application.DTOs;
+using AuthenticationJWT.Application.Interfaces;
 using AuthenticationJWT.Domain.Entities;
 using AuthenticationJWT.Infrastructure.Data;
 using AuthenticationJWT.SharedLibrary.Responses;
@@ -15,19 +16,19 @@ namespace AuthenticationJWT.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<Response> AddProduct(Product product)
+        public async Task<(Response, Product)> AddProduct(Product product)
         {
             var existingProduct = await _context.Products.FirstOrDefaultAsync(p => p.Name == product.Name);
             if (existingProduct is not null) 
-                return new Response(false, "Product with the same name already exists.");
+                return (new Response(false, "Product with the same name already exists."), null!);
 
             var createdProduct = await _context.Products.AddAsync(product);
             await _context.SaveChangesAsync();
 
             if (createdProduct.Entity.Id == Guid.Empty)
-                return new Response(false, "Failed to add the product.");
+                return (new Response(false, "Failed to add the product."), null!);
 
-            return new Response(true, "Product added successfully.");
+            return (new Response(true, "Product added successfully."), createdProduct.Entity);
 
         }
 

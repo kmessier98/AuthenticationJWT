@@ -7,11 +7,13 @@
             <label for="description">Description</label>
             <textarea id="description" formControlName="description"></textarea>
             <label for="unitPrice">Prix unitaire</label>
-            <input type="number" id="unitPrice" formControlName="unitPrice" value="0" min="0" />
+            <input type="number" id="unitPrice" formControlName="unitPrice" min="0" />
             <label for="quantity">Quantité</label>
-            <input type="number" id="quantity" formControlName="quantity" value="1" min="1" />
-            <button type="submit" class="mt-3 btn btn-primary">Créer le produit</button>
+            <input type="number" id="quantity" formControlName="quantity" min="1" />
+            @if (form.hasError('duplicateName')) {
+                <div class="error-message">Un produit avec ce nom existe déjà. Veuillez choisir un nom différent.</div>
+            }
+            <button type="submit" class="mt-3 btn btn-primary" [disabled]="isFormInvalid">Créer le produit</button>
         </div>
-
     </form>
 </div>

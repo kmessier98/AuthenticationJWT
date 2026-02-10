@@ -4,6 +4,7 @@ import { CreateProductDTO } from '../../../Models/Product/create-product-dto';
 import { Subscription } from 'rxjs';
 import { Form, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-create-product',
@@ -18,6 +19,7 @@ export class CreateProduct implements OnInit, OnDestroy {
   constructor(
     private productService: ProductService,
     private fb: FormBuilder,
+    private location: Location
   ) {}
 
   ngOnInit(): void {
@@ -25,7 +27,7 @@ export class CreateProduct implements OnInit, OnDestroy {
       name: ['', Validators.required],
       description: [''],
       unitPrice: [0, Validators.required],
-      quantity: [0, Validators.required],
+      quantity: [1, Validators.required],
     });
   }
 
@@ -50,15 +52,17 @@ export class CreateProduct implements OnInit, OnDestroy {
   }
 
   createProduct(): void {
-    //TODO catch error deja crer
     this.subscriptions.push(
       this.productService.createProduct(this.form.value).subscribe({
         next: (createdProduct) => {
           console.log('Produit créé avec succès :', createdProduct);
-          //TODO redirect vers la page de  la liste des produits
+          this.location.back();
         },
         error: (error) => {
           console.error('Erreur lors de la création du produit :', error);
+          if (error.status === 409) {
+            this.form.setErrors({ duplicateName: true });
+          }
         },
       }),
     );

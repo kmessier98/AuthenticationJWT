@@ -6,7 +6,7 @@ namespace AuthenticationJWT.Application.Interfaces
 {
     public interface IProductRepository
     {
-        Task<Response> AddProduct(Product product);
+        Task<(Response Response, Product Product)> AddProduct(Product product);
         Task<IEnumerable<Product>> GetProducts();
         Task<Response> DeleteProduct(Guid id);
     }

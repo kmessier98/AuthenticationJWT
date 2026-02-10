@@ -35,11 +35,20 @@ namespace AuthenticationJWT.Presentation.Controllers
         public async Task<ActionResult> AddProduct([FromBody] CreateProductDTO productDTO)
         {
             var product = _mapper.Map<Product>(productDTO);
-            var response = await _productRepository.AddProduct(product);
-            if (!response.IsSuccess)
-                return BadRequest(response.Message);
+            var data = await _productRepository.AddProduct(product);
+            if (!data.Response.IsSuccess)
+            {
+                var response = data.Response;
+                if (response.Message.Contains("already exists"))
+                {
+                    return Conflict(new { response.Message });
+                }
 
-            return Ok(response.Message);
+                return BadRequest(new { response.Message });
+            }  
+            
+            var productDto = _mapper.Map<ProductDTO>(data.Product);
+            return Ok(productDto);
         }
 
         [Authorize(Roles = "Admin")]
