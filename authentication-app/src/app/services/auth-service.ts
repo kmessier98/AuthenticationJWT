@@ -14,11 +14,10 @@ export class AuthService {
 
   constructor(private http: HttpClient) {
     this.currentUserSubject = new BehaviorSubject<CurrentUser | null>(
-      JSON.parse(localStorage.getItem('currentUser') || 'null')
+      JSON.parse(localStorage.getItem('currentUser') || 'null'),
     );
     this.currentUser$ = this.currentUserSubject.asObservable();
   }
-
 
   getUserRoles(): Observable<{ value: string; viewValue: string }[]> {
     return of([
@@ -34,14 +33,17 @@ export class AuthService {
   login(userName: string, password: string): Observable<any> {
     const loginData = { userName, password };
 
-    return this.http.post<{token: string, user: CurrentUser}>(`${this.backendUrl}/login`, loginData)
-      .pipe(map(response => {
-        const token = response.token;
-        const currentUser = response.user; 
-        localStorage.setItem('auth_token', token);  
-        localStorage.setItem('currentUser', JSON.stringify(response.user)); 
-        this.currentUserSubject.next(currentUser);
-      }));
+    return this.http
+      .post<{ token: string; user: CurrentUser }>(`${this.backendUrl}/login`, loginData)
+      .pipe(
+        map((response) => {
+          const token = response.token;
+          const currentUser = response.user;
+          localStorage.setItem('auth_token', token);
+          localStorage.setItem('currentUser', JSON.stringify(response.user));
+          this.currentUserSubject.next(currentUser);
+        }),
+      );
   }
 
   logout(): void {
@@ -56,12 +58,12 @@ export class AuthService {
   }
 
   updateUserProfile(updatedProfile: CurrentUser): Observable<any> {
-    return this.http.put(`${this.backendUrl}/UpdateUser`, updatedProfile)
-      .pipe(
-        map((response: any) => {
-          localStorage.setItem('currentUser', JSON.stringify(updatedProfile)); 
-          this.currentUserSubject.next(updatedProfile);
-        }),
-      );
+    return this.http.put<{ token: string }>(`${this.backendUrl}/UpdateUser`, updatedProfile).pipe(
+      map((response) => {
+        localStorage.setItem('auth_token', response.token);
+        localStorage.setItem('currentUser', JSON.stringify(updatedProfile));
+        this.currentUserSubject.next(updatedProfile);
+      }),
+    );
   }
 }
