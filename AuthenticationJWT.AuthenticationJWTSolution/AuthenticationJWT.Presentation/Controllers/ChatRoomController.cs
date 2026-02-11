@@ -1,6 +1,7 @@
 ﻿using AuthenticationJWT.Application.DTOs;
 using AuthenticationJWT.Application.Interfaces;
 using AuthenticationJWT.Domain.Entities;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -13,16 +14,28 @@ namespace AuthenticationJWT.Presentation.Controllers
     {
         private readonly IChatRoomService _chatRoomService;
         private readonly IChatRoomRepository _chatRoomRepository;
+        private readonly IMapper _mapper;
 
-        public ChatRoomController(IChatRoomService chatRoomService, IChatRoomRepository chatRoomRepository)
+        public ChatRoomController(IChatRoomService chatRoomService, IChatRoomRepository chatRoomRepository, IMapper mapper)
         {
             _chatRoomService = chatRoomService;
             _chatRoomRepository = chatRoomRepository;
+            _mapper = mapper;
         }
 
-        //[Authorize]
-        //[HttpGet]
-        //public async Task<>
+        [Authorize]
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<ChatRoomDTO>>> GetChatRooms()
+        {
+            var chatRooms = await _chatRoomRepository.GetAllChatRoomAsync();
+            if (chatRooms == null || !chatRooms.Any())
+                return NotFound("No chat rooms found");
+
+            var chatRoomsDTO = _mapper.Map<IEnumerable<ChatRoomDTO>>(chatRooms);
+
+            return Ok(chatRoomsDTO);
+        }
+
 
         [Authorize]
         [HttpPost("{chatRoomId}/messages")]
