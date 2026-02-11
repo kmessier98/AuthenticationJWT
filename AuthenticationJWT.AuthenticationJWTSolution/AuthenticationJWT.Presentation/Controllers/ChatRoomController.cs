@@ -36,6 +36,17 @@ namespace AuthenticationJWT.Presentation.Controllers
             return Ok(chatRoomsDTO);
         }
 
+        [Authorize]
+        [HttpGet("{chatroomId}")]
+        public async Task<ActionResult<ChatRoomDTO>> GetChatRoom(Guid chatRoomId)
+        {
+            var (response, chatRoom) = await _chatRoomService.GetChatRoomAsync(chatRoomId);
+            if (!response.IsSuccess)
+                return NotFound($"Chat room with id {chatRoomId} not found");
+
+            return Ok(chatRoom);
+        }
+
         [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<ChatRoomDTO>> CreateChatRoom([FromBody] string name)

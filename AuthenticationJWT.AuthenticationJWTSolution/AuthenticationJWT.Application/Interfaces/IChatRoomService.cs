@@ -7,7 +7,7 @@ namespace AuthenticationJWT.Application.Interfaces
     public interface IChatRoomService
     {
         Task<(Response Response, MessageDTO Message)> SendMessageAsync(Guid chatRoomId, Guid senderId, string content);
-        Task<(Response Response, IEnumerable<MessageDTO> Messages)> GetMessagesAsync(Guid id);
+        Task<(Response Response, ChatRoomDTO ChatRoom)> GetChatRoomAsync(Guid id);
         Task<(Response Response, ChatRoom ChatRoom)> CreateChatRoomAsync(string name);
     }
 }

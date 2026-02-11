@@ -32,9 +32,15 @@ namespace AuthenticationJWT.Application.Services
             return (new Response(true, "Chat room created successfully"), createdChatRoom);
         }
 
-        public async Task<(Response Response, IEnumerable<MessageDTO> Messages)> GetMessagesAsync(Guid chatRoomId)
+        public async Task<(Response Response, ChatRoomDTO ChatRoom)> GetChatRoomAsync(Guid chatRoomId)
         {
-            throw new NotImplementedException();
+            var chatRoom = await _chatRoomRepository.GetChatRoomByIdAsync(chatRoomId);
+            if (chatRoom == null)
+            {
+                return (new Response(false, "Chat room not found"), null!);
+            }
+
+            return (new Response(true, "ChatRoom retrieved successfully"), _mapper.Map<ChatRoomDTO>(chatRoom));
         }
 
         public async Task<(Response Response, MessageDTO Message)> SendMessageAsync(Guid chatRoomId, Guid senderId, string content)
