@@ -54,7 +54,15 @@ export class AuthService {
 
   isAuthenticated(): boolean {
     const token = localStorage.getItem('auth_token');
-    return !!token;
+      // Implement token expiration check (e.g., using jwt-helper or custom logic)
+    // For this example, let's assume a function isTokenExpired exists
+    if (token && !this.isTokenExpired(token)) {
+      return true;
+    }
+    else 
+    {
+      return false;
+    }
   }
 
   updateUserProfile(updatedProfile: CurrentUser): Observable<any> {
@@ -65,5 +73,12 @@ export class AuthService {
         this.currentUserSubject.next(updatedProfile);
       }),
     );
+  }
+
+    private isTokenExpired(token: string): boolean {
+    // Custom logic to check token 'exp' claim
+    // Alternatively, use a library like @auth0/angular-jwt 
+    const expiry = (JSON.parse(atob(token.split('.')[1]))).exp;
+    return (Math.floor((new Date).getTime() / 1000)) >= expiry;
   }
 }
