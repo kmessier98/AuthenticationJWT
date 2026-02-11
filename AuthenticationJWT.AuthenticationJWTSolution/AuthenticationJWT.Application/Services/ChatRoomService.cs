@@ -18,6 +18,20 @@ namespace AuthenticationJWT.Application.Services
             _authRepository = authRepository;
             _mapper = mapper;
         }
+
+        public async Task<(Response Response, ChatRoom ChatRoom)> CreateChatRoomAsync(string name)
+        {
+            var existingChatRoom = await _chatRoomRepository.GetChatRoomByNameAsync(name);
+            if (existingChatRoom != null)
+            {
+                return (new Response(false, "Chat room with this name already exists"), null!);
+            }
+
+            var createdChatRoom = await _chatRoomRepository.CreateChatRoomAsync(new ChatRoom { Name = name }); 
+
+            return (new Response(true, "Chat room created successfully"), createdChatRoom);
+        }
+
         public async Task<(Response Response, IEnumerable<MessageDTO> Messages)> GetMessagesAsync(Guid chatRoomId)
         {
             throw new NotImplementedException();
@@ -25,7 +39,7 @@ namespace AuthenticationJWT.Application.Services
 
         public async Task<(Response Response, MessageDTO Message)> SendMessageAsync(Guid chatRoomId, Guid senderId, string content)
         {
-            var chatRoom = await _chatRoomRepository.GetChatRoomAsync(chatRoomId);
+            var chatRoom = await _chatRoomRepository.GetChatRoomByIdAsync(chatRoomId);
             if (chatRoom == null)
             {
                 return (new Response(false, "Chat room not found"), null!);

@@ -36,6 +36,31 @@ namespace AuthenticationJWT.Presentation.Controllers
             return Ok(chatRoomsDTO);
         }
 
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        public async Task<ActionResult<ChatRoomDTO>> CreateChatRoom([FromBody] string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                return BadRequest("Chat room name cannot be empty");
+
+            var (response, chatRoom) = await _chatRoomService.CreateChatRoomAsync(name);
+            if (!response.IsSuccess)
+                return BadRequest(new { response.Message});
+
+            var chatRoomDTO = _mapper.Map<ChatRoomDTO>(chatRoom);
+            return Ok(chatRoomDTO);
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpDelete("{chatRoomId}")]
+        public async Task<ActionResult> DeleteChatRoom(Guid chatRoomId)
+        {
+            bool success = await _chatRoomRepository.DeleteChatRoomAsync(chatRoomId);
+            if (!success)
+                return BadRequest($"Failed to delete the chat room with id {chatRoomId}");
+
+            return NoContent();
+        }
 
         [Authorize]
         [HttpPost("{chatRoomId}/messages")]
@@ -53,7 +78,7 @@ namespace AuthenticationJWT.Presentation.Controllers
             var (response, message) = await _chatRoomService.SendMessageAsync(chatRoomId, _userId, content);
 
             if (!response.IsSuccess)
-                return BadRequest(response.Message);
+                return BadRequest(new { response.Message });
 
             return Ok(message);
         }
