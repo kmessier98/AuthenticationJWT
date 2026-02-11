@@ -1,5 +1,7 @@
 <div class="chat-room">
-    <button class="delete-icon" (click)="deleteChatRoom()">X</button>
+    @if (!chatRoom.isDefault && currentUser?.role === 'Admin') { 
+        <button class="delete-icon" (click)="deleteChatRoom()">X</button>
+    }
     <h2>{{ chatRoom.name }}</h2>
     <p>{{ chatRoom.description }}</p>
     <button (click)="joinChatRoom()">Rejoindre</button>

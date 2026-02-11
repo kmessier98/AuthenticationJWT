@@ -34,7 +34,14 @@ namespace AuthenticationJWT.Infrastructure.Repositories
 
         public async Task<IEnumerable<ChatRoom>> GetAllChatRoomAsync()
         {
-            var chatRooms = _context.ChatRooms.AsNoTracking().ToList();
+            var chatRooms = await _context.ChatRooms.AsNoTracking().
+                OrderBy(c => 
+                c.Name == "Général" ? 0 :
+                c.Name == "Support" ? 1 :
+                c.Name == "Off-topic" ? 2 :
+                3)
+                .ThenByDescending(c => c.IsDefault)
+                .ToListAsync();
 
             return chatRooms;
         }

@@ -49,14 +49,21 @@ namespace AuthenticationJWT.Presentation.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<ActionResult<ChatRoomDTO>> CreateChatRoom([FromBody] ChatRoomDTO chatRoom)
+        public async Task<ActionResult<ChatRoomDTO>> CreateChatRoom([FromBody] CreateChatRoomDTO request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var (response, createdChatRoom) = await _chatRoomService.CreateChatRoomAsync(chatRoom);
+            var (response, createdChatRoom) = await _chatRoomService.CreateChatRoomAsync(request.Name, request.Description);
             if (!response.IsSuccess)
-                return BadRequest(new { response.Message});
+            {
+                var message = response.Message;
+                if (message.Contains("already exists"))
+                    return Conflict(new { response.Message });
+
+                return BadRequest(new { response.Message });
+            }
+               
 
             return Ok(createdChatRoom);
         }

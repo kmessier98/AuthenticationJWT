@@ -1,0 +1,28 @@
+<div class="content">
+  <h1 class="mb-3">Créer un Salon</h1>
+  <form [formGroup]="form" (ngSubmit)="createChatRoom()">
+    <div class="mb-3">
+      <label for="name" class="form-label">Nom du salon</label>
+      <input type="text" id="name" class="form-control" formControlName="name" autocomplete="off" />
+      @if (name?.invalid && (name?.touched || name?.dirty)) {
+        @if (name?.errors?.['conflict']) {
+          <div class="error-message">
+            {{ name?.errors?.['conflict'] }}
+          </div>
+        } @else {
+          <div class="error-message">Le nom du salon est requis.</div>
+        }
+      }
+    </div>
+    <div class="mb-3">
+      <label for="description" class="form-label">Description</label>
+      <textarea
+        id="description"
+        class="form-control"
+        formControlName="description"
+        autocomplete="off"
+      ></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary" [disabled]="form.invalid">Créer</button>
+  </form>
+</div>

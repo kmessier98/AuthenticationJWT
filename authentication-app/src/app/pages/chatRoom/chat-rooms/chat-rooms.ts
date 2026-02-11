@@ -1,28 +1,41 @@
-import { Component, OnInit } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Observable, of, Subscription } from 'rxjs';
 import { ChatRoomDTO } from '../../../Models/chatRoom/chat-room.dto';
 import { AsyncPipe } from '@angular/common';
 import { ChatRoom } from "../../../components/chat-room/chat-room";
+import { ChatRoomService } from '../../../services/chat-room-service';
+import { CurrentUser } from '../../../Models/auth/current-user';
+import { AuthService } from '../../../services/auth-service';
+import { RouterLink } from "@angular/router";
 
 @Component({
   selector: 'app-chat-rooms',
-  imports: [AsyncPipe, ChatRoom],
+  imports: [AsyncPipe, ChatRoom, RouterLink],
   templateUrl: './chat-rooms.html',
   styleUrl: './chat-rooms.scss',
 })
-export class ChatRooms implements OnInit {
+export class ChatRooms implements OnInit, OnDestroy {
   chatRooms$: Observable<ChatRoomDTO[]> | null = null;
+  currentUser: CurrentUser | null = null;
+  subscriptions: Subscription[] = [];
+
+  constructor(private chatRoomService: ChatRoomService, private authService: AuthService) { }
 
   ngOnInit(): void {
-    this.chatRooms$ = of([
-      { id: 1, name: 'Général', description: 'Salon de discussion général' },
-      { id: 2, name: 'Support', description: 'Salon de support technique' },
-      { id: 3, name: 'Off-topic', description: 'Salon de discussion hors sujet' },
-    ]);
+    this.subscriptions.push(
+      this.authService.currentUser$.subscribe(user => {
+        this.currentUser = user;
+      })
+    );
+    this.chatRoomService.loadChatRooms();
+    this.chatRooms$ = this.chatRoomService.chatRooms$;
   }
 
   deleteChatRoom(chatRoomId: number): void {
-    // Logic to delete the chat room (e.g., call API to delete chat room)
-    console.log(`Chat room with ID ${chatRoomId} deleted`);
+    this.chatRoomService.deleteChatRoom(chatRoomId);
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 }

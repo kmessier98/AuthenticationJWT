@@ -10,6 +10,7 @@ import { Profil } from './pages/profil/profil';
 import { CreateProduct } from './pages/produits/create-product/create-product';
 import { adminGuard } from './auth/guards/admin-guard';
 import { ChatRooms } from './pages/chatRoom/chat-rooms/chat-rooms';
+import { CreateChatRoom } from './pages/chatRoom/create-chat-room/create-chat-room';
 
 export const routes: Routes = [
   {
@@ -46,6 +47,12 @@ export const routes: Routes = [
     path: 'chat-rooms',
     component: ChatRooms,
     canActivate: [authGuard]
+  },
+  {
+    path: 'chat-rooms/create',
+    component: CreateChatRoom, 
+    canActivate: [adminGuard],
+    data: { role: 'Admin' }
   },
   {
     path: 'mon-profil',
