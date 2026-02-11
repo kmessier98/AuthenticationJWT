@@ -24,6 +24,7 @@ builder.Services.AddScoped<IChatRoomService, ChatRoomService>();
 builder.Services.AddSwaggerGen();
 builder.Services.AddAutoMapper(cfg => cfg.AddProfile<ProductMappingProfile>());
 builder.Services.AddAutoMapper(cfg => cfg.AddProfile<ChatRoomMappingProfile>());
+builder.Services.AddAutoMapper(cfg => cfg.AddProfile<UserMappingProfile>());
 builder.Services.AddValidatorsFromAssemblyContaining<RegisterDTOValidator>();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));

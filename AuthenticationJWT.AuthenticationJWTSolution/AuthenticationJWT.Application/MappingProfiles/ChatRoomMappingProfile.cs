@@ -8,7 +8,9 @@ namespace AuthenticationJWT.Application.MappingProfiles
     {
         public ChatRoomMappingProfile()
         {
-            CreateMap<ChatRoom, ChatRoomDTO>().ReverseMap();
+            CreateMap<ChatRoom, ChatRoomDTO>()    
+                .ForMember(dest => dest.Messages, opt => opt.MapFrom(src => src.Messages))
+                .ReverseMap();
             CreateMap<Message, MessageDTO>().ReverseMap();
         }
     }

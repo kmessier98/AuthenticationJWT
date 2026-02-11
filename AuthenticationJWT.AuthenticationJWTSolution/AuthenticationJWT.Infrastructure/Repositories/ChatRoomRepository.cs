@@ -18,6 +18,7 @@ namespace AuthenticationJWT.Infrastructure.Repositories
         {
             var chatRoom = await _context.ChatRooms.
                 Include(m => m.Messages).
+                    ThenInclude(s => s.Sender).
                 FirstOrDefaultAsync(c => c.Id == id);
 
             return chatRoom!;
