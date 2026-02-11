@@ -7,6 +7,8 @@ namespace AuthenticationJWT.Infrastructure.Data
     {
         public DbSet<User> Users { get; set; }  
         public DbSet<Product> Products { get; set; }
+        public DbSet<ChatRoom> ChatRooms { get; set; }
+        public DbSet<Message> Messages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
