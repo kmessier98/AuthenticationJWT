@@ -8,6 +8,7 @@ namespace AuthenticationJWT.Application.DTOs
         [Required]
         public string Name { get; set; }  
         public string Description { get; set; }
+        public bool IsDefault { get; set; } 
         public IEnumerable<MessageDTO> Messages { get; set; }
     }
 }
