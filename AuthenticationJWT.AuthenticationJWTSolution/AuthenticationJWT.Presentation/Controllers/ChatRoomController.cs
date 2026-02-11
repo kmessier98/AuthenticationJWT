@@ -49,17 +49,16 @@ namespace AuthenticationJWT.Presentation.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<ActionResult<ChatRoomDTO>> CreateChatRoom([FromBody] string name)
+        public async Task<ActionResult<ChatRoomDTO>> CreateChatRoom([FromBody] ChatRoomDTO chatRoom)
         {
-            if (string.IsNullOrWhiteSpace(name))
-                return BadRequest("Chat room name cannot be empty");
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-            var (response, chatRoom) = await _chatRoomService.CreateChatRoomAsync(name);
+            var (response, createdChatRoom) = await _chatRoomService.CreateChatRoomAsync(chatRoom);
             if (!response.IsSuccess)
                 return BadRequest(new { response.Message});
 
-            var chatRoomDTO = _mapper.Map<ChatRoomDTO>(chatRoom);
-            return Ok(chatRoomDTO);
+            return Ok(createdChatRoom);
         }
 
         [Authorize(Roles = "Admin")]

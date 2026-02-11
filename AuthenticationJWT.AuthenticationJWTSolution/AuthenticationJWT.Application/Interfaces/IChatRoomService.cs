@@ -8,6 +8,6 @@ namespace AuthenticationJWT.Application.Interfaces
     {
         Task<(Response Response, MessageDTO Message)> SendMessageAsync(Guid chatRoomId, Guid senderId, string content);
         Task<(Response Response, ChatRoomDTO ChatRoom)> GetChatRoomAsync(Guid id);
-        Task<(Response Response, ChatRoom ChatRoom)> CreateChatRoomAsync(string name);
+        Task<(Response Response, ChatRoomDTO ChatRoom)> CreateChatRoomAsync(ChatRoomDTO chatRoom);
     }
 }

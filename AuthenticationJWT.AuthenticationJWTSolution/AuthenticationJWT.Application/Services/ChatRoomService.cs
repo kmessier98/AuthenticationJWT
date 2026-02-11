@@ -19,17 +19,19 @@ namespace AuthenticationJWT.Application.Services
             _mapper = mapper;
         }
 
-        public async Task<(Response Response, ChatRoom ChatRoom)> CreateChatRoomAsync(string name)
+        public async Task<(Response Response, ChatRoomDTO ChatRoom)> CreateChatRoomAsync(ChatRoomDTO chatRoom)
         {
-            var existingChatRoom = await _chatRoomRepository.GetChatRoomByNameAsync(name);
+            var existingChatRoom = await _chatRoomRepository.GetChatRoomByNameAsync(chatRoom.Name);
             if (existingChatRoom != null)
             {
                 return (new Response(false, "Chat room with this name already exists"), null!);
             }
 
-            var createdChatRoom = await _chatRoomRepository.CreateChatRoomAsync(new ChatRoom { Name = name }); 
+            var chatRoomEntity = _mapper.Map<ChatRoom>(chatRoom);
+            var createdChatRoom = await _chatRoomRepository.CreateChatRoomAsync(chatRoomEntity); 
+            var createdChatRoomDTO = _mapper.Map<ChatRoomDTO>(createdChatRoom);
 
-            return (new Response(true, "Chat room created successfully"), createdChatRoom);
+            return (new Response(true, "Chat room created successfully"), createdChatRoomDTO);
         }
 
         public async Task<(Response Response, ChatRoomDTO ChatRoom)> GetChatRoomAsync(Guid chatRoomId)
