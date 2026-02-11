@@ -1,0 +1,9 @@
+<div class="content">
+    <h1>Salons de Tchat</h1>
+    <p>Bienvenue dans les salons de tchat ! Ici, vous pouvez rejoindre des discussions en temps réel avec d'autres utilisateurs. Choisissez un salon pour commencer à discuter.</p>
+    <div class="chat-rooms">
+        @for (item of chatRooms$ | async; track item.id)  {
+            <app-chat-room [chatRoom]="item" (delete)="deleteChatRoom($event)"></app-chat-room>
+        }
+</div>
+

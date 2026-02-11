@@ -9,6 +9,7 @@ import { NetworkError } from './pages/network-error/network-error';
 import { Profil } from './pages/profil/profil';
 import { CreateProduct } from './pages/produits/create-product/create-product';
 import { adminGuard } from './auth/guards/admin-guard';
+import { ChatRooms } from './pages/chatRoom/chat-rooms/chat-rooms';
 
 export const routes: Routes = [
   {
@@ -40,6 +41,11 @@ export const routes: Routes = [
     component: CreateProduct,
     canActivate: [adminGuard],
     data: { role: 'Admin' },
+  },
+  {
+    path: 'chat-rooms',
+    component: ChatRooms,
+    canActivate: [authGuard]
   },
   {
     path: 'mon-profil',

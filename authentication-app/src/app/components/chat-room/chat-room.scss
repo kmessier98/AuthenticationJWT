@@ -1,0 +1,37 @@
+.chat-room {
+    background-color: #f0f0f0;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    transition: background-color 0.3s;
+    position: relative;
+
+    &:hover {
+        background-color: #e0e0e0;
+    }
+
+    .delete-icon {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: none;
+        border: none;
+        font-size: 16px;
+        cursor: pointer;
+
+        &:hover {
+            color: red;
+        }
+    }
+
+    .chat-room-name {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    .chat-room-description {
+        font-size: 14px;
+        color: #666;
+    }
+}

@@ -1,0 +1,18 @@
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+
+  p {
+    font-size: 18px;
+    color: #333;
+    max-width: 750px;
+    text-align: justify;
+  }
+  .chat-rooms {
+    width: 100%;
+    max-width: 750px;
+    margin-top: 20px;
+  }
+}
