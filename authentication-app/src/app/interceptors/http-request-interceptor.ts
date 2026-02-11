@@ -3,6 +3,7 @@ import { inject } from '@angular/core';
 import { catchError, throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import { AuthService } from '../services/auth-service';
+import { SKIP_AUTH_REDIRECT } from './skip-redirect.token';
 
 export const httpRequestInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
@@ -19,7 +20,17 @@ export const httpRequestInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
-      if (error.status === 0) {
+      const skipRedirect = req.context.get(SKIP_AUTH_REDIRECT); 
+  
+      if (skipRedirect)
+      {
+        // A utiliser si on ne veut pas de redirection pour une requete specifique
+        // Voici comment l'utiliser dans une requete HTTP :
+        // this.http.put(url, data, { context: new HttpContext().set(SKIP_AUTH_REDIRECT, true) })
+        // SKIP_AUTH_REDIRECT provient du fichier skip-redirect.token.ts (que j'ai créé)
+      }
+
+       if (error.status === 0) {
         // ERREUR RESEAU
         console.error('Backend unreachable:', error);
         router.navigate(['/network-error']);

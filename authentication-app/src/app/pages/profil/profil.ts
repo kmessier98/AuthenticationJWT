@@ -67,10 +67,8 @@ export class Profil implements OnInit, OnDestroy {
             catchError(error => {
               if (error.status === 400) {
                 this.profileForm.setErrors({ serverError: error.error.message || 'Une erreur est survenue lors de la mise à jour du profil.' });
-              } else if (error.status === 401) {
-                this.profileForm.setErrors({ serverError: 'Vous n\'êtes pas autorisé à effectuer cette action.' });
-              }
-                else if (error.status === 404) {
+              } 
+              else if (error.status === 404) {
                 this.profileForm.setErrors({ serverError: 'Utilisateur non trouvé. Veuillez réessayer.' });
               }
               else if (error.status === 409) {
