@@ -34,7 +34,7 @@ namespace AuthenticationJWT.Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ChatRooms");
+                    b.ToTable("ChatRooms", (string)null);
                 });
 
             modelBuilder.Entity("AuthenticationJWT.Domain.Entities.Message", b =>
@@ -62,7 +62,7 @@ namespace AuthenticationJWT.Infrastructure.Data.Migrations
 
                     b.HasIndex("SenderId");
 
-                    b.ToTable("Messages");
+                    b.ToTable("Messages", (string)null);
                 });
 
             modelBuilder.Entity("AuthenticationJWT.Domain.Entities.Product", b =>
@@ -89,7 +89,7 @@ namespace AuthenticationJWT.Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Products");
+                    b.ToTable("Products", (string)null);
                 });
 
             modelBuilder.Entity("AuthenticationJWT.Domain.Entities.User", b =>
@@ -114,7 +114,7 @@ namespace AuthenticationJWT.Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("AuthenticationJWT.Domain.Entities.Message", b =>
