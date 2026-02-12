@@ -1,9 +1,11 @@
 ﻿using AuthenticationJWT.Application.DTOs;
 using AuthenticationJWT.Application.Interfaces;
 using AuthenticationJWT.Domain.Entities;
+using AuthenticationJWT.Presentation.Hubs;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using System.Security.Claims;
 
 namespace AuthenticationJWT.Presentation.Controllers
@@ -15,12 +17,16 @@ namespace AuthenticationJWT.Presentation.Controllers
         private readonly IChatRoomService _chatRoomService;
         private readonly IChatRoomRepository _chatRoomRepository;
         private readonly IMapper _mapper;
-
-        public ChatRoomController(IChatRoomService chatRoomService, IChatRoomRepository chatRoomRepository, IMapper mapper)
+        private readonly IHubContext<ChatHub> _hubContext;
+        public ChatRoomController(IChatRoomService chatRoomService, 
+                                  IChatRoomRepository chatRoomRepository,
+                                  IMapper mapper,
+                                  IHubContext<ChatHub> hubContext)
         {
             _chatRoomService = chatRoomService;
             _chatRoomRepository = chatRoomRepository;
             _mapper = mapper;
+            _hubContext = hubContext;
         }
 
         [Authorize]
@@ -96,6 +102,10 @@ namespace AuthenticationJWT.Presentation.Controllers
 
             if (!response.IsSuccess)
                 return BadRequest(new { response.Message });
+
+            // Notification SignalR à tous les membres du groupe "chatRoomId"
+            await _hubContext.Clients.Group(chatRoomId.ToString())
+                .SendAsync("ReceiveMessage", message);
 
             return Ok(message);
         }

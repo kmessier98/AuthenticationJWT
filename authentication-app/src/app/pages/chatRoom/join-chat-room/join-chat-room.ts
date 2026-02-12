@@ -39,14 +39,14 @@ export class JoinChatRoom implements OnInit, OnDestroy {
     );
   }
 
- private scrollToBottom(): void {
-    // Le setTimeout 0 permet de s'assurer qu'Angular a fini de 
+  private scrollToBottom(): void {
+    // Le setTimeout 0 permet de s'assurer qu'Angular a fini de
     // rendre le DOM avant de calculer la position du scroll
     setTimeout(() => {
       if (this.messageItems.last) {
-        this.messageItems.last.nativeElement.scrollIntoView({ 
-          behavior: 'smooth', 
-          block: 'end' 
+        this.messageItems.last.nativeElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'end',
         });
       }
     }, 0);
@@ -59,34 +59,33 @@ export class JoinChatRoom implements OnInit, OnDestroy {
       }),
     );
     this.chatRoomId = this.route.snapshot.paramMap.get('id')!;
-
-    // Polling pour rafraîchir les messages toutes les secondes (utile pour quand les autres usagers envoient des messages,
-    //  afin de les voir)
-    // Note: This is a simple polling mechanism. For a real-time chat application,
-    //  consider using WebSockets or Server-Sent Events (SSE) for better performance and user experience.
-    const pollSub = interval(1000).subscribe(() => {
-      this.chatRoomService.loadMessages(this.chatRoomId);
-    });
-    this.subscriptions.push(pollSub);
+    this.chatRoomService.loadMessages(this.chatRoomId);
     this.messages$ = this.chatRoomService.messages$;
-  }
-
-  ngOnDestroy(): void {
-    this.subscriptions.forEach((sub) => sub.unsubscribe());
+    this.chatRoomService.startConnection(this.chatRoomId);
   }
 
   sendMessage(): void {
-    if (this.message.trim()) {
+    const content = this.message.trim();
+
+    if (content) {
+      this.message = '';
+
       this.subscriptions.push(
-        this.chatRoomService.sendMessage(this.chatRoomId, this.message).subscribe({
+        this.chatRoomService.sendMessage(this.chatRoomId, content).subscribe({
           next: () => {
-            this.message = '';
+            console.log('Message sent successfully');
           },
           error: (err) => {
             console.error('Failed to send message', err);
+            this.message = content; // 3. En cas d'échec, on remet le texte pour que l'utilisateur ne le perde pas
           },
         }),
       );
     }
+  }
+
+  ngOnDestroy(): void {
+    this.chatRoomService.stopConnection();
+    this.subscriptions.forEach((sub) => sub.unsubscribe());
   }
 }
