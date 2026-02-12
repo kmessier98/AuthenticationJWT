@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Observable, Subscription } from 'rxjs';
+import { interval, Observable, Subscription } from 'rxjs';
 import { ChatRoomService } from '../../../services/chat-room-service';
 import { CurrentUser } from '../../../Models/auth/current-user';
 import { AuthService } from '../../../services/auth-service';
@@ -34,7 +34,14 @@ export class JoinChatRoom implements OnInit, OnDestroy {
             })
         );
         this.chatRoomId = this.route.snapshot.paramMap.get('id')!;
-        this.chatRoomService.loadMessages(this.chatRoomId);
+
+        // Polling pour rafraîchir les messages toutes les secondes (utile pour quand les autres usagers envoient des messages,
+        //  afin de les voir)
+        // Note: This is a simple polling mechanism. For a real-time chat application,
+        //  consider using WebSockets or Server-Sent Events (SSE) for better performance and user experience.
+        interval(1000).subscribe(() => {
+            this.chatRoomService.loadMessages(this.chatRoomId);
+        });
         this.messages$ = this.chatRoomService.messages$;
         console.log('Current User in JoinChatRoom:', this.currentUser);
         console.log('Chat Room ID:', this.chatRoomId);
