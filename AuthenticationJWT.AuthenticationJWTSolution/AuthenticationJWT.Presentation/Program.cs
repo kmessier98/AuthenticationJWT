@@ -20,6 +20,7 @@ builder.Services.AddOpenApi();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IChatRoomRepository, ChatRoomRepository>();
 builder.Services.AddScoped<IChatRoomService, ChatRoomService>();
 builder.Services.AddSwaggerGen();
@@ -78,6 +79,7 @@ app.MapHub<ChatHub>("/chathub"); // Mapping du Hub SignalR pour les WebSockets. 
 app.UseAuthentication(); // Important de mettre avant Authorization
 app.UseAuthorization();
 app.MapControllers();
+app.UseStaticFiles(); // Pour pouvoir recuperer image dans le frontend
 
 app.Run();
 

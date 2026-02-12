@@ -3,4 +3,5 @@ export class CreateProductDTO {
   description!: string;
   unitPrice!: number;
   quantity!: number;
+  file: File | null = null;
 }

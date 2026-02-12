@@ -8,7 +8,8 @@ namespace AuthenticationJWT.Application.MappingProfiles
     {
         public ProductMappingProfile()
         {
-            CreateMap<Product, CreateProductDTO>().ReverseMap();
+            CreateMap<CreateProductDTO, Product>().ForMember(dest => dest.FileName, opt => opt.MapFrom(src => src.File == null ? null : src.File.FileName));
+            CreateMap<Product, CreateProductDTO>();
             CreateMap<Product, ProductDTO>().ReverseMap();
         }
     }

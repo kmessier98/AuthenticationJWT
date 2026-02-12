@@ -34,6 +34,15 @@
       margin-bottom: 1rem;
       width: 750px;
       display: flex;
+      align-items: center;
+
+      .product-image {
+        width: 150px;
+        height: 150px;
+        object-fit: cover;
+        margin-right: 1rem;
+        border-radius: 5px;
+      }
 
       h2 {
         font-size: 1.5rem;
@@ -51,6 +60,25 @@
         margin-left: auto;
         display: flex;
         gap: 10px;
+      }
+
+      button {
+        padding: 0.5rem 1rem;
+        font-size: 1rem;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        color: #fff;
+        height: 40px;
+        
+
+        &.btn-secondary {
+          background-color: #6c757d;
+
+          &:hover {
+            background-color: #5a6268;
+          }
+        }
       }
     }
   }

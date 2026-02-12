@@ -77,6 +77,10 @@ export class Produits implements OnInit, OnDestroy {
     );
   }
 
+  getProductImageUrl(fileName: string): string {
+    return `https://localhost:7125/images/${fileName}`;
+  }
+
   ngOnDestroy(): void {
     this.subscriptions.forEach((sub) => sub.unsubscribe());
   }

@@ -34,12 +34,14 @@ export class ProductService {
     );
   }
 
-  createProduct(productData: CreateProductDTO): Observable<ProductDTO> {
-    return this.http.post<ProductDTO>(`${this.backendUrl}/AddProduct`, productData).pipe(
-      tap((newProduct) => {
-        const updatedProducts = [...this.productsSubject.value, newProduct];
-        this.productsSubject.next(updatedProducts);
-      }),
-    );
-  }
+ createProduct(productData: FormData): Observable<ProductDTO> {
+  // Note : On envoie directement le FormData. 
+  // Angular détecte le type et configure le "Content-Type" en "multipart/form-data" automatiquement.
+  return this.http.post<ProductDTO>(`${this.backendUrl}/AddProduct`, productData).pipe(
+    tap((newProduct) => {
+      const updatedProducts = [...this.productsSubject.value, newProduct];
+      this.productsSubject.next(updatedProducts);
+    })
+  );
+}
 }

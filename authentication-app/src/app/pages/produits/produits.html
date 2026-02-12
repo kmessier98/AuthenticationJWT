@@ -11,11 +11,14 @@
     <div class="products-liste">
         @for (product of products$ | async ; track product.id) {
         <div class="product-card">
+            @if (product.fileName) {
+                <img [src]="getProductImageUrl(product.fileName)" alt="product" class="product-image" />
+            } 
             <h2>{{ product.name }}</h2>
             <div class="product-actions">
                 <button class="btn btn-secondary">Modifier</button>
                 @if (currentUser?.role === 'Admin') {
-                <button class="btn btn-danger" (click)="deleteProduct(product.id)">Supprimer</button>
+                    <button class="btn btn-danger" (click)="deleteProduct(product.id)">Supprimer</button>
                 }
             </div>
         </div>

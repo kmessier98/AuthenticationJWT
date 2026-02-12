@@ -18,10 +18,6 @@ namespace AuthenticationJWT.Infrastructure.Repositories
 
         public async Task<(Response, Product)> AddProduct(Product product)
         {
-            var existingProduct = await _context.Products.FirstOrDefaultAsync(p => p.Name == product.Name);
-            if (existingProduct is not null) 
-                return (new Response(false, "Product with the same name already exists."), null!);
-
             var createdProduct = await _context.Products.AddAsync(product);
             await _context.SaveChangesAsync();
 
@@ -30,6 +26,13 @@ namespace AuthenticationJWT.Infrastructure.Repositories
 
             return (new Response(true, "Product added successfully."), createdProduct.Entity);
 
+        }
+
+        public async Task<Product> GetProductByName(string name)
+        {
+            var product = await _context.Products.FirstOrDefaultAsync(p => p.Name == name);
+
+            return product!;
         }
 
         public async Task<IEnumerable<Product>> GetProducts(string name = "")

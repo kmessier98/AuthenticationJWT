@@ -12,11 +12,15 @@ namespace AuthenticationJWT.Presentation.Controllers
     public class ProductController : ControllerBase
     {
         private readonly IProductRepository _productRepository;
+        private readonly IProductService _productService;
         private readonly IMapper _mapper;
-        public ProductController(IMapper mapper, IProductRepository productRepository)
+        public ProductController(IMapper mapper, 
+                                IProductRepository productRepository,
+                                IProductService productService)
         {
             _mapper = mapper;
             _productRepository = productRepository;
+            _productService = productService;
         }
 
         [Authorize] //Doit etre connecté pour pouvoir accéder 
@@ -31,10 +35,10 @@ namespace AuthenticationJWT.Presentation.Controllers
 
         [Authorize(Roles = "Admin")] // Doit etre connecté et avoir le role admin pour créer produit
         [HttpPost("AddProduct")]
-        public async Task<ActionResult> AddProduct([FromBody] CreateProductDTO productDTO)
+        public async Task<ActionResult> AddProduct([FromForm] CreateProductDTO productDTO) //[FromForm] pour indiquer que les données proviennent d'un formulaire, notamment pour gérer les fichiers téléchargés (IFormFile)
+                                                                                           // Utilise pour pouvoir recuperer le fichier envoyé dans le formulaire et le traiter correctement dans l'action du contrôleur.
         {
-            var product = _mapper.Map<Product>(productDTO);
-            var data = await _productRepository.AddProduct(product);
+            var data = await _productService.AddProduct(productDTO);
             if (!data.Response.IsSuccess)
             {
                 var response = data.Response;
@@ -46,8 +50,7 @@ namespace AuthenticationJWT.Presentation.Controllers
                 return BadRequest(new { response.Message });
             }  
             
-            var productDto = _mapper.Map<ProductDTO>(data.Product);
-            return Ok(productDto);
+            return Ok(data.Product);
         }
 
         [Authorize(Roles = "Admin")]
