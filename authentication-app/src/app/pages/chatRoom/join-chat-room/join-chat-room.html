@@ -1,7 +1,7 @@
 <div class="content">
   <div class="chat-messages">
     @for (message of messages$ | async; track message.id) {
-      <div class="message">
+      <div class="message" #messageItem>
         <div class="message-header">
           <span class="sender">{{ message.sender.username }}</span>
           <span class="timestamp">{{ message.timestamp | date: 'short' }}</span>

@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { interval, Observable, Subscription } from 'rxjs';
 import { ChatRoomService } from '../../../services/chat-room-service';
@@ -17,53 +17,79 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './join-chat-room.scss',
 })
 export class JoinChatRoom implements OnInit, OnDestroy {
-    chatRoomId!: string;
-    subscriptions: Subscription[] = [];
-    currentUser: CurrentUser | null = null;
-    message: string = '';
-    messages$: Observable<MessageDTO[]> | null = null;
+  chatRoomId!: string;
+  subscriptions: Subscription[] = [];
+  currentUser: CurrentUser | null = null;
+  message: string = '';
+  messages$: Observable<MessageDTO[]> | null = null;
 
-    constructor(private route: ActivatedRoute, 
-                private chatRoomService: ChatRoomService,
-                private authService: AuthService) {}
+  constructor(
+    private route: ActivatedRoute,
+    private chatRoomService: ChatRoomService,
+    private authService: AuthService,
+  ) {}
 
-    ngOnInit(): void {
-        this.subscriptions.push(
-            this.authService.currentUser$.subscribe(user => {
-                this.currentUser = user;
-            })
-        );
-        this.chatRoomId = this.route.snapshot.paramMap.get('id')!;
+  @ViewChildren('messageItem') messageItems!: QueryList<ElementRef>;
 
-        // Polling pour rafraîchir les messages toutes les secondes (utile pour quand les autres usagers envoient des messages,
-        //  afin de les voir)
-        // Note: This is a simple polling mechanism. For a real-time chat application,
-        //  consider using WebSockets or Server-Sent Events (SSE) for better performance and user experience.
-        interval(1000).subscribe(() => {
-            this.chatRoomService.loadMessages(this.chatRoomId);
+  ngAfterViewInit() {
+    this.subscriptions.push(
+      this.messageItems.changes.subscribe(() => {
+        this.scrollToBottom();
+      }),
+    );
+  }
+
+ private scrollToBottom(): void {
+    // Le setTimeout 0 permet de s'assurer qu'Angular a fini de 
+    // rendre le DOM avant de calculer la position du scroll
+    setTimeout(() => {
+      if (this.messageItems.last) {
+        this.messageItems.last.nativeElement.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'end' 
         });
-        this.messages$ = this.chatRoomService.messages$;
-        console.log('Current User in JoinChatRoom:', this.currentUser);
-        console.log('Chat Room ID:', this.chatRoomId);
-        console.log('Messages Observable:', this.messages$);
-    }
-
-    ngOnDestroy(): void {
-        this.subscriptions.forEach(sub => sub.unsubscribe());
-    }
-
-    sendMessage(): void {
-      if (this.message.trim()) {
-        this.subscriptions.push(
-          this.chatRoomService.sendMessage(this.chatRoomId, this.message).subscribe({
-            next: () => {
-              this.message = '';
-            },
-            error: (err) => {
-              console.error('Failed to send message', err);
-            }
-          })
-        );
       }
+    }, 0);
+  }
+
+  ngOnInit(): void {
+    this.subscriptions.push(
+      this.authService.currentUser$.subscribe((user) => {
+        this.currentUser = user;
+      }),
+    );
+    this.chatRoomId = this.route.snapshot.paramMap.get('id')!;
+
+    // Polling pour rafraîchir les messages toutes les secondes (utile pour quand les autres usagers envoient des messages,
+    //  afin de les voir)
+    // Note: This is a simple polling mechanism. For a real-time chat application,
+    //  consider using WebSockets or Server-Sent Events (SSE) for better performance and user experience.
+    const pollSub = interval(1000).subscribe(() => {
+      this.chatRoomService.loadMessages(this.chatRoomId);
+    });
+    this.subscriptions.push(pollSub);
+    this.messages$ = this.chatRoomService.messages$;
+    console.log('Current User in JoinChatRoom:', this.currentUser);
+    console.log('Chat Room ID:', this.chatRoomId);
+    console.log('Messages Observable:', this.messages$);
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.forEach((sub) => sub.unsubscribe());
+  }
+
+  sendMessage(): void {
+    if (this.message.trim()) {
+      this.subscriptions.push(
+        this.chatRoomService.sendMessage(this.chatRoomId, this.message).subscribe({
+          next: () => {
+            this.message = '';
+          },
+          error: (err) => {
+            console.error('Failed to send message', err);
+          },
+        }),
+      );
     }
+  }
 }
