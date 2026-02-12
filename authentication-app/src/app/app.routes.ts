@@ -1,17 +1,7 @@
 import { Routes } from '@angular/router';
-import { Register } from './pages/register/register';
-import { Login } from './pages/login/login';
-import { Accueil } from './pages/accueil/accueil';
-import { Produits } from './pages/produits/produits';
 import { nonAuthGuard } from './auth/guards/non-auth-guard';
 import { authGuard } from './auth/guards/auth-guard';
-import { NetworkError } from './pages/network-error/network-error';
-import { Profil } from './pages/profil/profil';
-import { CreateProduct } from './pages/produits/create-product/create-product';
 import { adminGuard } from './auth/guards/admin-guard';
-import { ChatRooms } from './pages/chatRoom/chat-rooms/chat-rooms';
-import { CreateChatRoom } from './pages/chatRoom/create-chat-room/create-chat-room';
-import { JoinChatRoom } from './pages/chatRoom/join-chat-room/join-chat-room';
 
 export const routes: Routes = [
   {
@@ -24,50 +14,50 @@ export const routes: Routes = [
     canActivate: [nonAuthGuard],
     children: [
       { path: '', redirectTo: 'login', pathMatch: 'full' },
-      { path: 'login', component: Login },
-      { path: 'register', component: Register },
+      { path: 'login', loadComponent: () => import('./pages/login/login').then(m => m.Login) },
+      { path: 'register', loadComponent: () => import('./pages/register/register').then(m => m.Register) },
     ],
   },
   {
     path: 'accueil',
-    component: Accueil,
+    loadComponent: () => import('./pages/accueil/accueil').then(m => m.Accueil),
     canActivate: [authGuard],
   },
   {
     path: 'produits',
-    component: Produits,
+    loadComponent: () => import('./pages/produits/produits').then(m => m.Produits),
     canActivate: [authGuard],
   },
   {
     path: 'creer-produit',
-    component: CreateProduct,
+    loadComponent: () => import('./pages/produits/create-product/create-product').then(m => m.CreateProduct),
     canActivate: [adminGuard],
     data: { role: 'Admin' },
   },
   {
     path: 'chat-rooms',
-    component: ChatRooms,
+    loadComponent: () => import('./pages/chatRoom/chat-rooms/chat-rooms').then(m => m.ChatRooms),
     canActivate: [authGuard]
   },
   {
     path: 'chat-rooms/create',
-    component: CreateChatRoom, 
+    loadComponent: () => import('./pages/chatRoom/create-chat-room/create-chat-room').then(m => m.CreateChatRoom), 
     canActivate: [adminGuard],
     data: { role: 'Admin' }
   },
   {
     path: 'chat-rooms/:id',
-    component: JoinChatRoom, 
+    loadComponent: () => import('./pages/chatRoom/join-chat-room/join-chat-room').then(m => m.JoinChatRoom),
     canActivate: [authGuard]
   },
   {
     path: 'mon-profil',
-    component: Profil,
+    loadComponent: () => import('./pages/profil/profil').then(m => m.Profil),
     canActivate: [authGuard],
   },
   {
     path: 'network-error',
-    component: NetworkError,
+    loadComponent: () => import('./pages/network-error/network-error').then(m => m.NetworkError),
   },
   {
     path: '**',
