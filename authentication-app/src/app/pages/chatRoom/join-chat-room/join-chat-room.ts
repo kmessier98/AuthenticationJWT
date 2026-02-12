@@ -69,9 +69,6 @@ export class JoinChatRoom implements OnInit, OnDestroy {
     });
     this.subscriptions.push(pollSub);
     this.messages$ = this.chatRoomService.messages$;
-    console.log('Current User in JoinChatRoom:', this.currentUser);
-    console.log('Chat Room ID:', this.chatRoomId);
-    console.log('Messages Observable:', this.messages$);
   }
 
   ngOnDestroy(): void {
