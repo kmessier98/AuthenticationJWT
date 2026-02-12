@@ -3,10 +3,11 @@ import { ChatRoomDTO } from '../../Models/chatRoom/chat-room.dto';
 import { AuthService } from '../../services/auth-service';
 import { CurrentUser } from '../../Models/auth/current-user';
 import { Subscription } from 'rxjs';
+import { RouterLink } from "@angular/router";
 
 @Component({
   selector: 'app-chat-room',
-  imports: [],
+  imports: [RouterLink],
   templateUrl: './chat-room.html',
   styleUrl: './chat-room.scss',
 })

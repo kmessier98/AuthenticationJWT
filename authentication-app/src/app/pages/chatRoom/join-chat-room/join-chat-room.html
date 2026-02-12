@@ -1,0 +1,26 @@
+<div class="content">
+  <div class="chat-messages">
+    @for (message of messages$ | async; track message.id) {
+      <div class="message">
+        <div class="message-header">
+          <span class="sender">{{ message.sender.username }}</span>
+          <span class="timestamp">{{ message.timestamp | date: 'short' }}</span>
+        </div>
+        <div class="message-content">
+          {{ message.content }}
+        </div>
+      </div>
+    }
+  </div>
+
+  <form (ngSubmit)="sendMessage()" class="message-form mt-3">
+    <input
+      type="text"
+      [(ngModel)]="message"
+      name="message"
+      placeholder="Tapez votre message..."
+      autocomplete="off"
+    />
+    <button type="submit" [disabled]="!message.trim()">Envoyer</button>
+  </form>
+</div>

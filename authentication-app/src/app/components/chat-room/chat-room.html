@@ -4,5 +4,5 @@
     }
     <h2>{{ chatRoom.name }}</h2>
     <p>{{ chatRoom.description }}</p>
-    <button (click)="joinChatRoom()">Rejoindre</button>
+    <button [routerLink]="'/chat-rooms/' + chatRoom.id">Rejoindre</button>
 </div>

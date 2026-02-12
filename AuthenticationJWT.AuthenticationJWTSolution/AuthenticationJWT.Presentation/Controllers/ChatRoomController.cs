@@ -81,10 +81,10 @@ namespace AuthenticationJWT.Presentation.Controllers
 
         [Authorize]
         [HttpPost("{chatRoomId}/messages")]
-        public async Task<ActionResult<MessageDTO>> SendMessage(Guid chatRoomId, [FromBody] string content)
+        public async Task<ActionResult<MessageDTO>> SendMessage(Guid chatRoomId, [FromBody] SendMessageRequest request)
         {
-            if (string.IsNullOrWhiteSpace(content))
-                return BadRequest("Message content cannot be empty");
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
@@ -92,7 +92,7 @@ namespace AuthenticationJWT.Presentation.Controllers
                 return Unauthorized("User ID not found in token");
 
             var _userId = new Guid(userId);
-            var (response, message) = await _chatRoomService.SendMessageAsync(chatRoomId, _userId, content);
+            var (response, message) = await _chatRoomService.SendMessageAsync(chatRoomId, _userId, request.Content);
 
             if (!response.IsSuccess)
                 return BadRequest(new { response.Message });
