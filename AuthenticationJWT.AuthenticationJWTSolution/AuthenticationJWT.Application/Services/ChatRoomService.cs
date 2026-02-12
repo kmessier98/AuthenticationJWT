@@ -66,7 +66,7 @@ namespace AuthenticationJWT.Application.Services
             var message = new Message
             {
                 Content = content,
-                Timestamp = DateTime.UtcNow,
+                Timestamp = DateTimeOffset.UtcNow,
                 SenderId = senderId,
                 ChatRoomId = chatRoomId
             };
